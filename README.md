@@ -4,6 +4,7 @@ Tutorial codes for .Net 5 Web Api
 # Visual Studio Code extensions
 - https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp
 - https://marketplace.visualstudio.com/items?itemName=formulahendry.dotnet-test-explorer
+- https://marketplace.visualstudio.com/items?itemName=donjayamanne.githistory
 
 # Useful Visual Studio Code references
 - https://docs.microsoft.com/en-us/dotnet/core/tutorials/with-visual-studio-code#debug
