@@ -5,6 +5,13 @@ This is to follow the following.
 - Dependency injection
    - https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-5.0
 - JWT bearer token auth
-   - (TODO) https://docs.microsoft.com/en-us/aspnet/core/security/authentication/?view=aspnetcore-5.0
-- (TODO) Logging in ASP.NET Core
-- (TODO) web browser session cookie auth
+   - https://docs.microsoft.com/en-us/aspnet/core/security/authentication/?view=aspnetcore-5.0
+   - https://www.c-sharpcorner.com/article/asp-net-core-web-api-5-0-authentication-using-jwtjson-base-token/
+      - dotnet add package Microsoft.AspNetCore.Authentication
+      - dotnet add package System.IdentityModel.Tokens.Jwt
+      - dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
+   - (Check the Claim part.) https://www.c-sharpcorner.com/article/jwt-json-web-token-authentication-in-asp-net-core/
+   - (Check the Swagger part.) https://www.c-sharpcorner.com/article/authentication-and-authorization-in-asp-net-5-with-jwt-and-swagger/
+- Logging in ASP.NET Core
+- Session cookie auth
+- User framework

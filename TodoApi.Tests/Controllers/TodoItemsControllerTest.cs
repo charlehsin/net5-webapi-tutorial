@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using TodoApi.Authentication;
 using TodoApi.Controllers;
 using TodoApi.Models;
 using TodoApi.Repositories;
@@ -14,14 +15,16 @@ namespace TodoApi.Tests
     [TestClass]
     public class TodoItemsControllerTest
     {
+        private Mock<IMyClaim> _mockIMyClaim;
         private Mock<ITodoItemsRepository> _mockITodoItemsRepository;
         private TodoItemsController _controller;
 
         [TestInitialize]
         public void TestInitialize()
         {
+            _mockIMyClaim = new Mock<IMyClaim>();
             _mockITodoItemsRepository = new Mock<ITodoItemsRepository>();
-            _controller = new TodoItemsController(_mockITodoItemsRepository.Object);
+            _controller = new TodoItemsController(_mockIMyClaim.Object, _mockITodoItemsRepository.Object);
         }
 
         #region GetTodoItems
@@ -53,22 +56,22 @@ namespace TodoApi.Tests
 
         #endregion
 
-        #region GetTodoItem
+        #region GetTodoItemById
 
         [TestMethod]
-        public async Task GetTodoItem_DoesNotExist_ShouldReturnNotFound()
+        public async Task GetTodoItemById_DoesNotExist_ShouldReturnNotFound()
         {
             _mockITodoItemsRepository
                 .Setup(repo => repo.FindAsync(It.IsAny<long>()))
                 .Returns(Task.FromResult<TodoItem>(null));
 
-            var actionResult = await _controller.GetTodoItem(1);
+            var actionResult = await _controller.GetTodoItemById(1);
             
             Assert.IsInstanceOfType(actionResult.Result, typeof(NotFoundResult));
         }
 
         [TestMethod]
-        public async Task GetTodoItem_Exist_ShouldReturnMatchingItem()
+        public async Task GetTodoItemById_Exist_ShouldReturnMatchingItem()
         {
             _mockITodoItemsRepository
                 .Setup(repo => repo.FindAsync(1).Result)
@@ -81,7 +84,7 @@ namespace TodoApi.Tests
                         Secret = "S1"                    
                     });
 
-            var actionResult = await _controller.GetTodoItem(1);
+            var actionResult = await _controller.GetTodoItemById(1);
             var result = actionResult.Value as TodoItemDTO;
             Assert.AreEqual(1, result.Id);
             Assert.AreEqual("N1", result.Name);

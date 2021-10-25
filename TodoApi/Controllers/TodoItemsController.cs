@@ -1,21 +1,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TodoApi.Authentication;
 using TodoApi.Models;
 using TodoApi.Repositories;
 
 namespace TodoApi.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class TodoItemsController : ControllerBase
     {
+        private readonly IMyClaim _myClaim;
         private readonly ITodoItemsRepository _todoItemsRepository;
 
-        public TodoItemsController(ITodoItemsRepository todoItemsRepository)
+        public TodoItemsController(IMyClaim myClaim, ITodoItemsRepository todoItemsRepository)
         {
+            _myClaim = myClaim;
             _todoItemsRepository = todoItemsRepository;
         }
 
@@ -23,13 +28,15 @@ namespace TodoApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TodoItemDTO>>> GetTodoItems()
         {
+            var username = _myClaim.ParseAuthClaim(HttpContext);
+
             var items = await _todoItemsRepository.GetAllAsync();
             return items.Select(x => ItemToDTO(x)).ToList();
         }
 
         // GET: api/TodoItems/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TodoItemDTO>> GetTodoItem(long id)
+        public async Task<ActionResult<TodoItemDTO>> GetTodoItemById(long id)
         {
             var todoItem = await _todoItemsRepository.FindAsync(id);
 
@@ -46,6 +53,8 @@ namespace TodoApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTodoItem(long id, TodoItemDTO todoItemDTO)
         {
+            var username = _myClaim.ParseAuthClaim(HttpContext);
+
             if (id != todoItemDTO.Id)
             {
                 return BadRequest();
@@ -77,6 +86,8 @@ namespace TodoApi.Controllers
         [HttpPost]
         public async Task<ActionResult<TodoItemDTO>> CreateTodoItem(TodoItemDTO todoItemDTO)
         {
+            var username = _myClaim.ParseAuthClaim(HttpContext);
+
             var todoItem = new TodoItem
             {
                 Id = todoItemDTO.Id,
@@ -92,6 +103,8 @@ namespace TodoApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTodoItem(long id)
         {
+            var username = _myClaim.ParseAuthClaim(HttpContext);
+            
             var todoItem = await _todoItemsRepository.FindAsync(id);
             if (todoItem == null)
             {
