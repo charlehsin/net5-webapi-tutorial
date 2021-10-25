@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using TodoApi.Models;
+using TodoApi.Repositories;
 using Microsoft.OpenApi.Models;
 
 namespace TodoApi
@@ -24,6 +25,8 @@ namespace TodoApi
 
             services.AddControllers();
             
+            AddDependencyInjection(services);
+
             services.AddDbContext<TodoContext>(opt =>
                                                opt.UseInMemoryDatabase("TodoList"));
             services.AddSwaggerGen(c =>
@@ -52,6 +55,15 @@ namespace TodoApi
             {
                 endpoints.MapControllers();
             });
+        }
+
+        /// <summary>
+        /// Perform dependency injection.
+        /// </summary>
+        /// <param name="services"></param>
+        private void AddDependencyInjection(IServiceCollection services)
+        {
+            services.AddScoped<ITodoItemsRepository, TodoItemsRepository>();
         }
     }
 }
