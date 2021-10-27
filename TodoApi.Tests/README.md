@@ -1,5 +1,4 @@
 # Tutorial codes for TodoApi
-This is to follow the following.
 - Basic unit testing
    - https://docs.microsoft.com/en-us/dotnet/core/tutorials/testing-library-with-visual-studio-code
    - https://www.pluralsight.com/guides/testing-.net-core-apps-with-visual-studio-code
@@ -13,7 +12,7 @@ This is to follow the following.
 - .NET CLI
    - https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-test
    - https://docs.microsoft.com/en-us/dotnet/core/testing/selective-unit-tests?pivots=mstest
-- Some useful .NET CLI
+- Useful .NET CLI commands
    - dotnet test
    - (test project) dotnet test TodoApi.Tests.csproj
    - (test target method) dotnet test --filter GetTodoItems

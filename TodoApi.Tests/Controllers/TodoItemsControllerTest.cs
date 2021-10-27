@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Moq;
 using TodoApi.Authentication;
 using TodoApi.Controllers;
@@ -17,6 +18,7 @@ namespace TodoApi.Tests
     {
         private Mock<IMyClaim> _mockIMyClaim;
         private Mock<ITodoItemsRepository> _mockITodoItemsRepository;
+        private Mock<ILogger<TodoItemsController>> _mockILogger;
         private TodoItemsController _controller;
 
         [TestInitialize]
@@ -24,7 +26,9 @@ namespace TodoApi.Tests
         {
             _mockIMyClaim = new Mock<IMyClaim>();
             _mockITodoItemsRepository = new Mock<ITodoItemsRepository>();
-            _controller = new TodoItemsController(_mockIMyClaim.Object, _mockITodoItemsRepository.Object);
+            _mockILogger = new Mock<ILogger<TodoItemsController>>();
+            _controller = new TodoItemsController(_mockIMyClaim.Object, _mockITodoItemsRepository.Object,
+                _mockILogger.Object);
         }
 
         #region GetTodoItems

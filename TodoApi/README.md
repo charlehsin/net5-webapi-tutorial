@@ -1,5 +1,4 @@
 # Tutorial codes for TodoApi
-This is to follow the following.
 - Initial tutorial
    - https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-web-api?view=aspnetcore-5.0&tabs=visual-studio-code.
 - Dependency injection
@@ -13,5 +12,9 @@ This is to follow the following.
    - (Check the Claim part.) https://www.c-sharpcorner.com/article/jwt-json-web-token-authentication-in-asp-net-core/
    - (Check the Swagger part.) https://www.c-sharpcorner.com/article/authentication-and-authorization-in-asp-net-5-with-jwt-and-swagger/
 - Logging in ASP.NET Core
+   - https://docs.microsoft.com/en-us/dotnet/core/extensions/logging-providers
+   - https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-5.0
 - Session cookie auth
 - User framework
+- Useful .NET CLI commands
+   - dotnet run --configuration Release

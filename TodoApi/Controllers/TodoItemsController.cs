@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using TodoApi.Authentication;
 using TodoApi.Models;
 using TodoApi.Repositories;
@@ -17,11 +18,14 @@ namespace TodoApi.Controllers
     {
         private readonly IMyClaim _myClaim;
         private readonly ITodoItemsRepository _todoItemsRepository;
+        private readonly ILogger _logger;
 
-        public TodoItemsController(IMyClaim myClaim, ITodoItemsRepository todoItemsRepository)
+        public TodoItemsController(IMyClaim myClaim, ITodoItemsRepository todoItemsRepository,
+            ILogger<TodoItemsController> logger)
         {
             _myClaim = myClaim;
             _todoItemsRepository = todoItemsRepository;
+            _logger = logger;
         }
 
         // GET: api/TodoItems
@@ -29,6 +33,8 @@ namespace TodoApi.Controllers
         public async Task<ActionResult<IEnumerable<TodoItemDTO>>> GetTodoItems()
         {
             var username = _myClaim.ParseAuthClaim(HttpContext);
+
+            _logger.Log(LogLevel.Debug, $"User {username} is getting all items.");
 
             var items = await _todoItemsRepository.GetAllAsync();
             return items.Select(x => ItemToDTO(x)).ToList();
@@ -38,13 +44,16 @@ namespace TodoApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<TodoItemDTO>> GetTodoItemById(long id)
         {
-            var todoItem = await _todoItemsRepository.FindAsync(id);
+            var username = _myClaim.ParseAuthClaim(HttpContext);
 
+            var todoItem = await _todoItemsRepository.FindAsync(id);
             if (todoItem == null)
             {
+                _logger.Log(LogLevel.Debug, $"User {username} is trying to get an item with id {id} that does not exist.");
                 return NotFound();
             }
 
+            _logger.Log(LogLevel.Debug, $"User {username} is getting an item with id {id}.");
             return ItemToDTO(todoItem);
         }
 
@@ -57,12 +66,14 @@ namespace TodoApi.Controllers
 
             if (id != todoItemDTO.Id)
             {
+                _logger.Log(LogLevel.Debug, $"User {username} is sending bad request with mismatching id.");
                 return BadRequest();
             }
 
             var todoItem = await _todoItemsRepository.FindAsync(id);
             if (todoItem == null)
             {
+                _logger.Log(LogLevel.Debug, $"User {username} is trying to update an item with id {id} that does not exist.");
                 return NotFound();
             }
 
@@ -75,9 +86,11 @@ namespace TodoApi.Controllers
             }
             catch (DbUpdateConcurrencyException) when (!_todoItemsRepository.DoesItemExist(id))
             {
+                _logger.Log(LogLevel.Error, $"User {username} fails to update an item with id {id}.");
                 return NotFound();
             }
 
+            _logger.Log(LogLevel.Debug, $"User {username} updated an item with id {id}.");
             return NoContent();
         }
 
@@ -96,6 +109,7 @@ namespace TodoApi.Controllers
             };
             await _todoItemsRepository.AddAsync(todoItem);
 
+            _logger.Log(LogLevel.Debug, $"User {username} created an item with id {todoItemDTO.Id}.");
             return CreatedAtAction(nameof(CreateTodoItem), new { id = todoItem.Id }, ItemToDTO(todoItem));
         }
 
@@ -108,11 +122,13 @@ namespace TodoApi.Controllers
             var todoItem = await _todoItemsRepository.FindAsync(id);
             if (todoItem == null)
             {
+                _logger.Log(LogLevel.Debug, $"User {username} tries to delete an item with id {id} that does not exist.");
                 return NotFound();
             }
 
             await _todoItemsRepository.RemoveAsync(todoItem);
 
+            _logger.Log(LogLevel.Debug, $"User {username} deleted an item with id {id}.");
             return NoContent();
         }
 
