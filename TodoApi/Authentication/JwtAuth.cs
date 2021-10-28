@@ -2,10 +2,11 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
 namespace TodoApi.Authentication
-{
+{       
     public class JwtAuth: IJwtAuth
     {
         private const string Username = "tester";
@@ -38,9 +39,11 @@ namespace TodoApi.Authentication
             {
                 Subject = new ClaimsIdentity(
                     new []
-                    {
-                        new Claim(ClaimTypes.Name, username)
-                    }),
+                        {
+                            new Claim(ClaimTypes.Name, username),
+                            new Claim(ClaimTypes.Role, "Administrator")
+                        },
+                    JwtBearerDefaults.AuthenticationScheme),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)

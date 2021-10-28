@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using TodoApi.Models;
 using TodoApi.Repositories;
 using TodoApi.Authentication;
+using Microsoft.AspNetCore.Http;
 
 namespace TodoApi
 {
@@ -55,14 +56,16 @@ namespace TodoApi
 
             app.UseRouting();
 
+            SetAuthCookiePolicy(app);
+
             app.UseAuthentication();
 
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+                {
+                    endpoints.MapControllers();
+                });
         }
 
         /// <summary>
@@ -71,22 +74,23 @@ namespace TodoApi
         /// <param name="services"></param>
         private void AddAuthentication(IServiceCollection services)
         {
-            services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(x =>
-            {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Tempkey))
-                };
-            });
+            services.AddAuthentication()
+                .AddCookie(options =>
+                    {
+                        options.EventsType = typeof(CustomCookieAuthenticationEvents);
+                    })  
+                .AddJwtBearer(x =>
+                    {
+                        x.RequireHttpsMetadata = false;
+                        x.SaveToken = true;
+                        x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                            {
+                                ValidateIssuerSigningKey = true,
+                                ValidateIssuer = false,
+                                ValidateAudience = false,
+                                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Tempkey))
+                            };
+                    });
         }
 
         /// <summary>
@@ -97,7 +101,9 @@ namespace TodoApi
         {   
             services.AddScoped<IMyClaim, MyClaim>();
             services.AddScoped<ITodoItemsRepository, TodoItemsRepository>();
+            services.AddScoped<CustomCookieAuthenticationEvents>();
             services.AddSingleton<IJwtAuth>(new JwtAuth(Tempkey));
+            services.AddSingleton<ICookieAuth>(new CookieAuth());
         }
 
         /// <summary>
@@ -107,34 +113,46 @@ namespace TodoApi
         private void AddSwagger(IServiceCollection services)
         {
             services.AddSwaggerGen(swagger =>
-            {
-                swagger.SwaggerDoc("v1", new OpenApiInfo { Title = "TodoApi", Version = "v1" });
+                {
+                    swagger.SwaggerDoc("v1", new OpenApiInfo { Title = "TodoApi", Version = "v1" });
 
-                // To Enable authorization using Swagger (JWT)    
-                swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()  
-                {  
-                    Name = "Authorization",  
-                    Type = SecuritySchemeType.ApiKey,  
-                    Scheme = "Bearer",  
-                    BearerFormat = "JWT",  
-                    In = ParameterLocation.Header,  
-                    Description = "Enter 'Bearer' [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\"",  
-                });  
-                swagger.AddSecurityRequirement(new OpenApiSecurityRequirement  
-                {  
+                    // To Enable authorization using Swagger (JWT)    
+                    swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()  
                     {  
-                        new OpenApiSecurityScheme  
+                        Name = "Authorization",  
+                        Type = SecuritySchemeType.ApiKey,  
+                        Scheme = "Bearer",  
+                        BearerFormat = "JWT",  
+                        In = ParameterLocation.Header,  
+                        Description = "Enter 'Bearer' [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\"",  
+                    });  
+                    swagger.AddSecurityRequirement(new OpenApiSecurityRequirement  
+                    {  
                         {  
-                            Reference = new OpenApiReference  
+                            new OpenApiSecurityScheme  
                             {  
-                                Type = ReferenceType.SecurityScheme,  
-                                Id = "Bearer"  
-                            }  
-                        },  
-                        new string[] {}    
-                    }  
-                });  
-            });
+                                Reference = new OpenApiReference  
+                                {  
+                                    Type = ReferenceType.SecurityScheme,  
+                                    Id = "Bearer"  
+                                }  
+                            },  
+                            new string[] {}    
+                        }  
+                    });  
+                });
+        }
+    
+        /// <summary>
+        /// Set the auth cookie policy.
+        /// </summary>
+        /// <param name="app"></param>
+        private void SetAuthCookiePolicy(IApplicationBuilder app)
+        {
+            app.UseCookiePolicy(new CookiePolicyOptions
+                {
+                    MinimumSameSitePolicy = SameSiteMode.Lax,
+                });
         }
     }
 }

@@ -31,10 +31,10 @@ namespace TodoApi.Tests
                 _mockILogger.Object);
         }
 
-        #region GetTodoItems
+        #region GetTodoItemsAsync
 
         [TestMethod]
-        public async Task GetTodoItems_HappyPath_ShouldReturnMatchingList()
+        public async Task GetTodoItemsAsync_HappyPath_ShouldReturnMatchingList()
         {
             _mockITodoItemsRepository
                 .Setup(repo => repo.GetAllAsync().Result)
@@ -48,7 +48,7 @@ namespace TodoApi.Tests
                     }
                 });
 
-            var actionResult = await _controller.GetTodoItems();
+            var actionResult = await _controller.GetTodoItemsAsync();
 
             IEnumerable<TodoItemDTO> enumerable = actionResult.Value as IEnumerable<TodoItemDTO>;
             var result = enumerable.ToList();
@@ -60,22 +60,22 @@ namespace TodoApi.Tests
 
         #endregion
 
-        #region GetTodoItemById
+        #region GetTodoItemByIdAsync
 
         [TestMethod]
-        public async Task GetTodoItemById_DoesNotExist_ShouldReturnNotFound()
+        public async Task GetTodoItemByIdAsync_DoesNotExist_ShouldReturnNotFound()
         {
             _mockITodoItemsRepository
                 .Setup(repo => repo.FindAsync(It.IsAny<long>()))
                 .Returns(Task.FromResult<TodoItem>(null));
 
-            var actionResult = await _controller.GetTodoItemById(1);
+            var actionResult = await _controller.GetTodoItemByIdAsync(1);
             
             Assert.IsInstanceOfType(actionResult.Result, typeof(NotFoundResult));
         }
 
         [TestMethod]
-        public async Task GetTodoItemById_Exist_ShouldReturnMatchingItem()
+        public async Task GetTodoItemByIdAsync_Exist_ShouldReturnMatchingItem()
         {
             _mockITodoItemsRepository
                 .Setup(repo => repo.FindAsync(1).Result)
@@ -88,7 +88,7 @@ namespace TodoApi.Tests
                         Secret = "S1"                    
                     });
 
-            var actionResult = await _controller.GetTodoItemById(1);
+            var actionResult = await _controller.GetTodoItemByIdAsync(1);
             var result = actionResult.Value as TodoItemDTO;
             Assert.AreEqual(1, result.Id);
             Assert.AreEqual("N1", result.Name);
@@ -97,12 +97,12 @@ namespace TodoApi.Tests
 
         #endregion
 
-        #region UpdateTodoItem
+        #region UpdateTodoItemAsync
 
         [TestMethod]
-        public async Task UpdateTodoItem_MismatchingId_ShouldReturnBadRequest()
+        public async Task UpdateTodoItemAsync_MismatchingId_ShouldReturnBadRequest()
         {
-            var actionResult = await _controller.UpdateTodoItem(1,
+            var actionResult = await _controller.UpdateTodoItemAsync(1,
                 new TodoItemDTO
                 {
                     Id = 2
@@ -112,13 +112,13 @@ namespace TodoApi.Tests
         }
 
         [TestMethod]
-        public async Task UpdateTodoItem_DoesNotExist_ShouldReturnNotFound()
+        public async Task UpdateTodoItemAsync_DoesNotExist_ShouldReturnNotFound()
         {
             _mockITodoItemsRepository
                 .Setup(repo => repo.FindAsync(It.IsAny<long>()))
                 .Returns(Task.FromResult<TodoItem>(null));
 
-            var actionResult = await _controller.UpdateTodoItem(1,
+            var actionResult = await _controller.UpdateTodoItemAsync(1,
                 new TodoItemDTO
                 {
                     Id = 1
@@ -128,7 +128,7 @@ namespace TodoApi.Tests
         }
 
         [TestMethod]
-        public async Task UpdateTodoItem_HappyPath_ShouldReturnNoContent()
+        public async Task UpdateTodoItemAsync_HappyPath_ShouldReturnNoContent()
         {
             _mockITodoItemsRepository
                 .Setup(repo => repo.FindAsync(1).Result)
@@ -144,7 +144,7 @@ namespace TodoApi.Tests
                 .Setup(repo => repo.SaveChangesAsync())
                 .Returns(Task.CompletedTask);
 
-            var actionResult = await _controller.UpdateTodoItem(1,
+            var actionResult = await _controller.UpdateTodoItemAsync(1,
                 new TodoItemDTO
                 {
                     Id = 1
@@ -154,7 +154,7 @@ namespace TodoApi.Tests
         }
 
         [TestMethod]
-        public async Task UpdateTodoItem_ThrowTargetExceptionAndDoesNotExist_ShouldReturnNotFound()
+        public async Task UpdateTodoItemAsync_ThrowTargetExceptionAndDoesNotExist_ShouldReturnNotFound()
         {
             _mockITodoItemsRepository
                 .Setup(repo => repo.FindAsync(1).Result)
@@ -173,7 +173,7 @@ namespace TodoApi.Tests
                 .Setup(repo => repo.DoesItemExist(1))
                 .Returns(false);
 
-            var actionResult = await _controller.UpdateTodoItem(1,
+            var actionResult = await _controller.UpdateTodoItemAsync(1,
                 new TodoItemDTO
                 {
                     Id = 1
@@ -184,16 +184,16 @@ namespace TodoApi.Tests
 
         #endregion
 
-        #region CreateTodoItem
+        #region CreateTodoItemAsync
 
         [TestMethod]
-        public async Task CreateTodoItem_HappyPath_ShouldReturnCreatedAtAction()
+        public async Task CreateTodoItemAsync_HappyPath_ShouldReturnCreatedAtAction()
         {
             _mockITodoItemsRepository
                 .Setup(repo => repo.AddAsync(It.IsAny<TodoItem>()))
                 .Returns(Task.CompletedTask);
 
-            var actionResult = await _controller.CreateTodoItem(new TodoItemDTO
+            var actionResult = await _controller.CreateTodoItemAsync(new TodoItemDTO
                 {
                     Id = 1,
                     Name = "N1",
@@ -211,22 +211,22 @@ namespace TodoApi.Tests
 
         #endregion
 
-        #region DeleteTodoItem
+        #region DeleteTodoItemAsync
 
         [TestMethod]
-        public async Task DeleteTodoItem_DoesNotExist_ShouldReturnNotFound()
+        public async Task DeleteTodoItemAsync_DoesNotExist_ShouldReturnNotFound()
         {
             _mockITodoItemsRepository
                 .Setup(repo => repo.FindAsync(It.IsAny<long>()))
                 .Returns(Task.FromResult<TodoItem>(null));
 
-            var actionResult = await _controller.DeleteTodoItem(1);
+            var actionResult = await _controller.DeleteTodoItemAsync(1);
 
             Assert.IsInstanceOfType(actionResult, typeof(NotFoundResult));
         }
 
         [TestMethod]
-        public async Task DeleteTodoItem_Exist_ShouldReturnNoContent()
+        public async Task DeleteTodoItemAsync_Exist_ShouldReturnNoContent()
         {
             _mockITodoItemsRepository
                 .Setup(repo => repo.FindAsync(1).Result)
@@ -242,7 +242,7 @@ namespace TodoApi.Tests
                 .Setup(repo => repo.RemoveAsync(It.IsAny<TodoItem>()))
                 .Returns(Task.CompletedTask);
 
-            var actionResult = await _controller.DeleteTodoItem(1);
+            var actionResult = await _controller.DeleteTodoItemAsync(1);
 
             Assert.IsInstanceOfType(actionResult, typeof(NoContentResult));
         }

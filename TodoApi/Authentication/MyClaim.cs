@@ -9,14 +9,24 @@ namespace TodoApi.Authentication
         public string ParseAuthClaim(HttpContext context)
         {
             var currentUser = context.User;    
-            if (currentUser == null)
+            if (context == null || currentUser == null)
             {
                 return string.Empty;
             }
 
-            if (currentUser.HasClaim(c => c.Type == ClaimTypes.Name))    
+            return ParseAuthClaim(currentUser);
+        }
+
+        public string ParseAuthClaim(ClaimsPrincipal principal)
+        {
+            if (principal == null)
+            {
+                return string.Empty;
+            }
+
+            if (principal.HasClaim(c => c.Type == ClaimTypes.Name))    
             {    
-                return currentUser.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
+                return principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
             }
 
             return string.Empty;

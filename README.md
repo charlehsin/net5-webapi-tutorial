@@ -1,8 +1,6 @@
-# Net5WebApiTutorial
+# Tutorial for ASP.NET 5 Web API
 
 ## Overview
-
-Tutorial codes for .Net 5 Web Api
 
 ## Visual Studio Code extensions
 
