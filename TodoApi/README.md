@@ -38,7 +38,7 @@ You should not use this for production.
 
 ## Cookie auth
 
-- commit 
+- commit 113b690de388c0802a6f0727e22120a08e0a0bd8
 - https://docs.microsoft.com/en-us/aspnet/core/security/authentication/cookie?view=aspnetcore-5.0
    - https://docs.microsoft.com/en-us/aspnet/core/security/authorization/limitingidentitybyscheme?view=aspnetcore-5.0&tabs=aspnetcore2x
 - https://www.c-sharpcorner.com/article/cookie-authentication-in-asp-net-core/ 
