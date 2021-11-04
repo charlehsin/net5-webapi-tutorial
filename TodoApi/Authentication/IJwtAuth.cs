@@ -1,13 +1,15 @@
+using System.Collections.Generic;
+
 namespace TodoApi.Authentication
 {
     public interface IJwtAuth
     {
         /// <summary>
-        /// Authenticate the user and return the JWT.
+        /// Get the JWT.
         /// </summary>
-        /// <param name="username"></param>
-        /// <param name="password"></param>
-        /// <returns></returns>
-        string Authenticate(string username, string password);
+        /// <param name="userName"></param>
+        /// <param name="roles"></param>
+        /// <returns>JWT</returns>
+        string GetToken(string userName, IList<string> roles);
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -9,9 +10,6 @@ namespace TodoApi.Authentication
 {       
     public class JwtAuth: IJwtAuth
     {
-        private const string Username = "tester";
-        private const string Password = "P@ssw0rd";
-
         private readonly string _key;
 
         public JwtAuth(string key)
@@ -19,15 +17,8 @@ namespace TodoApi.Authentication
             _key = key;
         }
         
-        public string Authenticate(string username, string password)
+        public string GetToken(string userName, IList<string> roles)
         {
-            // TODO: This is just for tutorial purpose. The real production application should have real flow to check username and password.
-
-            if (!(username.Equals(Username) || password.Equals(Password)))
-            {
-                return null;
-            }
-
             // 1. Create Security Token Handler
             var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -35,14 +26,18 @@ namespace TodoApi.Authentication
             var tokenKey = Encoding.ASCII.GetBytes(_key);
 
             //3. Create JETdescriptor
+            var authClaims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, userName)
+                };
+            foreach (var role in roles)  
+            {
+                authClaims.Add(new Claim(ClaimTypes.Role, role));  
+            }
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
                 Subject = new ClaimsIdentity(
-                    new []
-                        {
-                            new Claim(ClaimTypes.Name, username),
-                            new Claim(ClaimTypes.Role, "Administrator")
-                        },
+                    authClaims,
                     JwtBearerDefaults.AuthenticationScheme),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(

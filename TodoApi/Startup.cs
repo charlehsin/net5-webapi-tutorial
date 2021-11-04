@@ -1,25 +1,24 @@
 using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Http;
 using TodoApi.Models;
 using TodoApi.Repositories;
 using TodoApi.Authentication;
-using Microsoft.AspNetCore.Http;
+using TodoApi.Identity;
+using TodoApi.Data;
 
 namespace TodoApi
 {
     public class Startup
     {
-        // TODO: This is just for tutorial purpose. The real key in production should not be here.
-        private const string Tempkey = "Tutorial Key. Do not use in production.";
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -30,15 +29,12 @@ namespace TodoApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllers();
 
             AddAuthentication(services);
+            AddIdentity(services);
             AddDependencyInjection(services);
-
-            services.AddDbContext<TodoContext>(opt =>
-                                               opt.UseInMemoryDatabase("TodoList"));
-
+            AddDbContext(services);
             AddSwagger(services);
         }
 
@@ -88,7 +84,8 @@ namespace TodoApi
                                 ValidateIssuerSigningKey = true,
                                 ValidateIssuer = false,
                                 ValidateAudience = false,
-                                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Tempkey))
+                                IssuerSigningKey = new SymmetricSecurityKey(
+                                    Encoding.ASCII.GetBytes(Configuration["JWT:Secret"]))
                             };
                     });
         }
@@ -102,8 +99,35 @@ namespace TodoApi
             services.AddScoped<IMyClaim, MyClaim>();
             services.AddScoped<ITodoItemsRepository, TodoItemsRepository>();
             services.AddScoped<CustomCookieAuthenticationEvents>();
-            services.AddSingleton<IJwtAuth>(new JwtAuth(Tempkey));
+            services.AddScoped<IUserManagerWrapper, UserManagerWrapper>();
+            services.AddScoped<IRoleManagerWrapper, RoleManagerWrapper>();
+            services.AddSingleton<IJwtAuth>(new JwtAuth(Configuration["JWT:Secret"]));
             services.AddSingleton<ICookieAuth>(new CookieAuth());
+        }
+
+        /// <summary>
+        /// Add DB context.
+        /// </summary>
+        /// <param name="services"></param>
+        private void AddDbContext(IServiceCollection services)
+        {
+            services.AddDbContext<TodoContext>(opt =>
+                opt.UseInMemoryDatabase("TodoList"));
+                
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlite(
+                    Configuration.GetConnectionString("DefaultConnection")));
+        }
+
+        /// <summary>
+        /// Add Identity.
+        /// </summary>
+        /// <param name="services"></param>
+        private void AddIdentity(IServiceCollection services)
+        {
+            services.AddIdentity<AppUser, IdentityRole>()  
+                .AddEntityFrameworkStores<ApplicationDbContext>()  
+                .AddDefaultTokenProviders();
         }
 
         /// <summary>

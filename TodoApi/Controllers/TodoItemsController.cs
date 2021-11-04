@@ -32,9 +32,9 @@ namespace TodoApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TodoItemDTO>>> GetTodoItemsAsync()
         {
-            var username = _myClaim.ParseAuthClaim(HttpContext);
+            var parsedClaim = _myClaim.ParseAuthClaim(HttpContext);
 
-            _logger.Log(LogLevel.Debug, $"User {username} is getting all items.");
+            _logger.Log(LogLevel.Debug, $"User {parsedClaim.UserName} is getting all items.");
 
             var items = await _todoItemsRepository.GetAllAsync();
             return items.Select(x => ItemToDTO(x)).ToList();
@@ -44,16 +44,16 @@ namespace TodoApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<TodoItemDTO>> GetTodoItemByIdAsync(long id)
         {
-            var username = _myClaim.ParseAuthClaim(HttpContext);
+            var parsedClaim = _myClaim.ParseAuthClaim(HttpContext);
 
             var todoItem = await _todoItemsRepository.FindAsync(id);
             if (todoItem == null)
             {
-                _logger.Log(LogLevel.Debug, $"User {username} is trying to get an item with id {id} that does not exist.");
+                _logger.Log(LogLevel.Debug, $"User {parsedClaim.UserName} is trying to get an item with id {id} that does not exist.");
                 return NotFound();
             }
 
-            _logger.Log(LogLevel.Debug, $"User {username} is getting an item with id {id}.");
+            _logger.Log(LogLevel.Debug, $"User {parsedClaim.UserName} is getting an item with id {id}.");
             return ItemToDTO(todoItem);
         }
 
@@ -62,18 +62,18 @@ namespace TodoApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTodoItemAsync(long id, TodoItemDTO todoItemDTO)
         {
-            var username = _myClaim.ParseAuthClaim(HttpContext);
+            var parsedClaim = _myClaim.ParseAuthClaim(HttpContext);
 
             if (id != todoItemDTO.Id)
             {
-                _logger.Log(LogLevel.Debug, $"User {username} is sending bad request with mismatching id.");
+                _logger.Log(LogLevel.Debug, $"User {parsedClaim.UserName} is sending bad request with mismatching id.");
                 return BadRequest();
             }
 
             var todoItem = await _todoItemsRepository.FindAsync(id);
             if (todoItem == null)
             {
-                _logger.Log(LogLevel.Debug, $"User {username} is trying to update an item with id {id} that does not exist.");
+                _logger.Log(LogLevel.Debug, $"User {parsedClaim.UserName} is trying to update an item with id {id} that does not exist.");
                 return NotFound();
             }
 
@@ -86,11 +86,11 @@ namespace TodoApi.Controllers
             }
             catch (DbUpdateConcurrencyException) when (!_todoItemsRepository.DoesItemExist(id))
             {
-                _logger.Log(LogLevel.Error, $"User {username} fails to update an item with id {id}.");
+                _logger.Log(LogLevel.Error, $"User {parsedClaim.UserName} fails to update an item with id {id}.");
                 return NotFound();
             }
 
-            _logger.Log(LogLevel.Debug, $"User {username} updated an item with id {id}.");
+            _logger.Log(LogLevel.Debug, $"User {parsedClaim.UserName} updated an item with id {id}.");
             return NoContent();
         }
 
@@ -100,7 +100,7 @@ namespace TodoApi.Controllers
         [ActionName("CreateTodoItemAsync")]
         public async Task<ActionResult<TodoItemDTO>> CreateTodoItemAsync(TodoItemDTO todoItemDTO)
         {
-            var username = _myClaim.ParseAuthClaim(HttpContext);
+            var parsedClaim = _myClaim.ParseAuthClaim(HttpContext);
 
             var todoItem = new TodoItem
             {
@@ -110,26 +110,26 @@ namespace TodoApi.Controllers
             };
             await _todoItemsRepository.AddAsync(todoItem);
 
-            _logger.Log(LogLevel.Debug, $"User {username} created an item with id {todoItemDTO.Id}.");
-            return CreatedAtAction(nameof(CreateTodoItemAsync), new { id = todoItem.Id }, ItemToDTO(todoItem));
+            _logger.Log(LogLevel.Debug, $"User {parsedClaim.UserName} created an item with id {todoItemDTO.Id}.");
+            return CreatedAtAction(nameof(CreateTodoItemAsync), ItemToDTO(todoItem));
         }
 
         // DELETE: api/TodoItems/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTodoItemAsync(long id)
         {
-            var username = _myClaim.ParseAuthClaim(HttpContext);
-            
+            var parsedClaim = _myClaim.ParseAuthClaim(HttpContext);
+
             var todoItem = await _todoItemsRepository.FindAsync(id);
             if (todoItem == null)
             {
-                _logger.Log(LogLevel.Debug, $"User {username} tries to delete an item with id {id} that does not exist.");
+                _logger.Log(LogLevel.Debug, $"User {parsedClaim.UserName} tries to delete an item with id {id} that does not exist.");
                 return NotFound();
             }
 
             await _todoItemsRepository.RemoveAsync(todoItem);
 
-            _logger.Log(LogLevel.Debug, $"User {username} deleted an item with id {id}.");
+            _logger.Log(LogLevel.Debug, $"User {parsedClaim.UserName} deleted an item with id {id}.");
             return NoContent();
         }
 

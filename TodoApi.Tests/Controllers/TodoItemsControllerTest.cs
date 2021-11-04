@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using TodoApi.Authentication;
 using TodoApi.Controllers;
@@ -29,6 +30,14 @@ namespace TodoApi.Tests
             _mockILogger = new Mock<ILogger<TodoItemsController>>();
             _controller = new TodoItemsController(_mockIMyClaim.Object, _mockITodoItemsRepository.Object,
                 _mockILogger.Object);
+
+            _mockIMyClaim
+                .Setup(myClaim => myClaim.ParseAuthClaim(It.IsAny<HttpContext>()))
+                .Returns(new ParsedClaim
+                {
+                    UserName = "tester",
+                    Roles = new List<string>()
+                });
         }
 
         #region GetTodoItemsAsync
@@ -38,7 +47,8 @@ namespace TodoApi.Tests
         {
             _mockITodoItemsRepository
                 .Setup(repo => repo.GetAllAsync().Result)
-                .Returns(new List<TodoItem> {
+                .Returns(new List<TodoItem>
+                {
                     new TodoItem
                     {
                         Id = 1,
@@ -70,7 +80,7 @@ namespace TodoApi.Tests
                 .Returns(Task.FromResult<TodoItem>(null));
 
             var actionResult = await _controller.GetTodoItemByIdAsync(1);
-            
+
             Assert.IsInstanceOfType(actionResult.Result, typeof(NotFoundResult));
         }
 
@@ -85,7 +95,7 @@ namespace TodoApi.Tests
                         Id = 1,
                         Name = "N1",
                         IsComplete = true,
-                        Secret = "S1"                    
+                        Secret = "S1"
                     });
 
             var actionResult = await _controller.GetTodoItemByIdAsync(1);
@@ -107,7 +117,7 @@ namespace TodoApi.Tests
                 {
                     Id = 2
                 });
-            
+
             Assert.IsInstanceOfType(actionResult, typeof(BadRequestResult));
         }
 
@@ -123,7 +133,7 @@ namespace TodoApi.Tests
                 {
                     Id = 1
                 });
-            
+
             Assert.IsInstanceOfType(actionResult, typeof(NotFoundResult));
         }
 
@@ -138,7 +148,7 @@ namespace TodoApi.Tests
                         Id = 1,
                         Name = "N1",
                         IsComplete = true,
-                        Secret = "S1"                    
+                        Secret = "S1"
                     });
             _mockITodoItemsRepository
                 .Setup(repo => repo.SaveChangesAsync())
@@ -149,7 +159,7 @@ namespace TodoApi.Tests
                 {
                     Id = 1
                 });
-            
+
             Assert.IsInstanceOfType(actionResult, typeof(NoContentResult));
         }
 
@@ -164,7 +174,7 @@ namespace TodoApi.Tests
                         Id = 1,
                         Name = "N1",
                         IsComplete = true,
-                        Secret = "S1"                    
+                        Secret = "S1"
                     });
             _mockITodoItemsRepository
                 .Setup(repo => repo.SaveChangesAsync())
@@ -178,7 +188,7 @@ namespace TodoApi.Tests
                 {
                     Id = 1
                 });
-            
+
             Assert.IsInstanceOfType(actionResult, typeof(NotFoundResult));
         }
 
@@ -194,11 +204,11 @@ namespace TodoApi.Tests
                 .Returns(Task.CompletedTask);
 
             var actionResult = await _controller.CreateTodoItemAsync(new TodoItemDTO
-                {
-                    Id = 1,
-                    Name = "N1",
-                    IsComplete = true
-                });
+            {
+                Id = 1,
+                Name = "N1",
+                IsComplete = true
+            });
 
             Assert.IsInstanceOfType(actionResult.Result, typeof(CreatedAtActionResult));
 
@@ -236,7 +246,7 @@ namespace TodoApi.Tests
                         Id = 1,
                         Name = "N1",
                         IsComplete = true,
-                        Secret = "S1"                    
+                        Secret = "S1"
                     });
             _mockITodoItemsRepository
                 .Setup(repo => repo.RemoveAsync(It.IsAny<TodoItem>()))

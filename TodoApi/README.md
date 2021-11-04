@@ -2,12 +2,19 @@
 
 ## Overview
 
-When this is running, open https://localhost:5001/swagger. Then you can use 1 of the following to authenticate:
+When this is running, open https://localhost:5001/swagger. 
+
+Use the following to create a new user:
+- For ease of testing purpose, this does not require authentication.
+- Use "POST api/Users" API
+
+Use the following to delete a user:
+- For ease of testing purpose, this does not require authentication.
+- Use "DELETE api/Users/{id}" API
+
+Then you can use 1 of the following to authenticate:
 - Use "POST api/Users/authenticate/cookie" API to authenticate and use "POST api/Users/signout/cookie" to sign out.
 - Use "POST api/Users/authenticate/jwt" API and Swagger's Authenticate button to authenticate.
-
-Currently, for this tutorial purpose, to authenticate, you need to use "tester" as the user name and "P@ss0wrd" as the password.
-You should not use this for production.
 
 ## Initial tutorial
 
@@ -43,7 +50,25 @@ You should not use this for production.
    - https://docs.microsoft.com/en-us/aspnet/core/security/authorization/limitingidentitybyscheme?view=aspnetcore-5.0&tabs=aspnetcore2x
 - https://www.c-sharpcorner.com/article/cookie-authentication-in-asp-net-core/ 
 
-## User framework
+## Identity
+
+### Basic
+
+- commit ??
+- Use Entity Framework Core and migration to create the basic identiy database tables. Then new user can be created and then logged in.
+- https://docs.microsoft.com/en-us/aspnet/core/security/authentication/individual?view=aspnetcore-5.0
+- https://www.c-sharpcorner.com/article/authentication-and-authorization-in-asp-net-core-web-api-with-json-web-tokens/
+   - dotnet add package Microsoft.EntityFrameworkCore.Sqlite
+   - dotnet add package Microsoft.EntityFrameworkCore.Tools
+   - dotnet add package Microsoft.AspNetCore.Identity
+   - dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore
+   - dotnet add package Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore
+
+### Advanced
+
+- commit ??
+- https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-configuration?view=aspnetcore-5.0
+- https://docs.microsoft.com/en-us/aspnet/core/security/authorization/roles?view=aspnetcore-5.0
 
 ## Useful .NET CLI commands
 

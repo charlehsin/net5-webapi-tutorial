@@ -9,14 +9,14 @@ namespace TodoApi.Authentication
         /// Parse the authentication claim.
         /// </summary>
         /// <param name="context"></param>
-        /// <returns>user name</returns>
-        string ParseAuthClaim(HttpContext context);
+        /// <returns>ParsedClaim</returns>
+        ParsedClaim ParseAuthClaim(HttpContext context);
 
         /// <summary>
         /// Parse the authentication claim.
         /// </summary>
         /// <param name="principal"></param>
-        /// <returns>user name</returns>
-        string ParseAuthClaim(ClaimsPrincipal principal);
+        /// <returns>ParsedClaim</returns>
+        ParsedClaim ParseAuthClaim(ClaimsPrincipal principal);
     }
 }

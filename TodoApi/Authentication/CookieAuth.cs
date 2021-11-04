@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
@@ -8,25 +9,20 @@ namespace TodoApi.Authentication
 {       
     public class CookieAuth: ICookieAuth
     {
-        private const string Username = "tester";
-        private const string Password = "P@ssw0rd";
-
-        public async Task<bool> AuthenticateAsync(string username, string password,
+        public async Task SignInAsync(string userName, IList<string> roles,
             HttpContext context)
         {
-            // TODO: This is just for tutorial purpose. The real production application should have real flow to check username and password.
-
-            if (!(username.Equals(Username) || password.Equals(Password)))
+            var authClaims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, userName)
+                };
+            foreach (var role in roles)  
             {
-                return false;
+                authClaims.Add(new Claim(ClaimTypes.Role, role));  
             }
-            
+
             var claimsIdentity = new ClaimsIdentity(
-                new []
-                    {
-                        new Claim(ClaimTypes.Name, username),
-                        new Claim(ClaimTypes.Role, "Administrator")
-                    },
+                authClaims,
                 CookieAuthenticationDefaults.AuthenticationScheme);
 
             var authProperties = new AuthenticationProperties
@@ -57,8 +53,6 @@ namespace TodoApi.Authentication
                 CookieAuthenticationDefaults.AuthenticationScheme, 
                 new ClaimsPrincipal(claimsIdentity), 
                 authProperties);
-
-            return true;
         }
 
         public async Task SignOutAsync(HttpContext context)
