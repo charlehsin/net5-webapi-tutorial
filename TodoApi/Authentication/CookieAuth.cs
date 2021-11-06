@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 
 namespace TodoApi.Authentication
-{       
+{
     public class CookieAuth: ICookieAuth
     {
         public async Task SignInAsync(string userName, IList<string> roles,
@@ -16,9 +16,9 @@ namespace TodoApi.Authentication
                 {
                     new Claim(ClaimTypes.Name, userName)
                 };
-            foreach (var role in roles)  
+            foreach (var role in roles)
             {
-                authClaims.Add(new Claim(ClaimTypes.Role, role));  
+                authClaims.Add(new Claim(ClaimTypes.Role, role));
             }
 
             var claimsIdentity = new ClaimsIdentity(
@@ -31,12 +31,12 @@ namespace TodoApi.Authentication
                 // Refreshing the authentication session should be allowed.
 
                 //ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10),
-                // The time at which the authentication ticket expires. A 
-                // value set here overrides the ExpireTimeSpan option of 
+                // The time at which the authentication ticket expires. A
+                // value set here overrides the ExpireTimeSpan option of
                 // CookieAuthenticationOptions set with AddCookie.
 
                 //IsPersistent = true,
-                // Whether the authentication session is persisted across 
+                // Whether the authentication session is persisted across
                 // multiple requests. When used with cookies, controls
                 // whether the cookie's lifetime is absolute (matching the
                 // lifetime of the authentication ticket) or session-based.
@@ -45,13 +45,13 @@ namespace TodoApi.Authentication
                 // The time at which the authentication ticket was issued.
 
                 //RedirectUri = <string>
-                // The full path or absolute URI to be used as an http 
+                // The full path or absolute URI to be used as an http
                 // redirect response value.
             };
 
             await context.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme, 
-                new ClaimsPrincipal(claimsIdentity), 
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
                 authProperties);
         }
 

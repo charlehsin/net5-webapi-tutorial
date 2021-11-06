@@ -8,8 +8,8 @@ public class CustomCookieAuthenticationEvents : CookieAuthenticationEvents
 {
     private readonly IMyClaim _myClaim;
     private readonly ILogger _logger;
-    
-    public CustomCookieAuthenticationEvents(IMyClaim myClaim, 
+
+    public CustomCookieAuthenticationEvents(IMyClaim myClaim,
         ILogger<CustomCookieAuthenticationEvents> logger)
     {
         _myClaim = myClaim;

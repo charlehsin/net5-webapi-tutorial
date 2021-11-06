@@ -58,6 +58,6 @@ namespace TodoApi.Identity
         {
             return await _userManager.GetRolesAsync(user);
         }
-        
+
     }
 }

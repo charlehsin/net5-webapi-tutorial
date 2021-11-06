@@ -74,7 +74,7 @@ namespace TodoApi
                 .AddCookie(options =>
                     {
                         options.EventsType = typeof(CustomCookieAuthenticationEvents);
-                    })  
+                    })
                 .AddJwtBearer(x =>
                     {
                         x.RequireHttpsMetadata = false;
@@ -95,7 +95,7 @@ namespace TodoApi
         /// </summary>
         /// <param name="services"></param>
         private void AddDependencyInjection(IServiceCollection services)
-        {   
+        {
             services.AddScoped<IMyClaim, MyClaim>();
             services.AddScoped<ITodoItemsRepository, TodoItemsRepository>();
             services.AddScoped<CustomCookieAuthenticationEvents>();
@@ -113,7 +113,7 @@ namespace TodoApi
         {
             services.AddDbContext<TodoContext>(opt =>
                 opt.UseInMemoryDatabase("TodoList"));
-                
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite(
                     Configuration.GetConnectionString("DefaultConnection")));
@@ -125,8 +125,8 @@ namespace TodoApi
         /// <param name="services"></param>
         private void AddIdentity(IServiceCollection services)
         {
-            services.AddIdentity<AppUser, IdentityRole>()  
-                .AddEntityFrameworkStores<ApplicationDbContext>()  
+            services.AddIdentity<AppUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
         }
 
@@ -140,33 +140,33 @@ namespace TodoApi
                 {
                     swagger.SwaggerDoc("v1", new OpenApiInfo { Title = "TodoApi", Version = "v1" });
 
-                    // To Enable authorization using Swagger (JWT)    
-                    swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()  
-                    {  
-                        Name = "Authorization",  
-                        Type = SecuritySchemeType.ApiKey,  
-                        Scheme = "Bearer",  
-                        BearerFormat = "JWT",  
-                        In = ParameterLocation.Header,  
-                        Description = "Enter 'Bearer' [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\"",  
-                    });  
-                    swagger.AddSecurityRequirement(new OpenApiSecurityRequirement  
-                    {  
-                        {  
-                            new OpenApiSecurityScheme  
-                            {  
-                                Reference = new OpenApiReference  
-                                {  
-                                    Type = ReferenceType.SecurityScheme,  
-                                    Id = "Bearer"  
-                                }  
-                            },  
-                            new string[] {}    
-                        }  
-                    });  
+                    swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                    {
+                        Name = "Authorization",
+                        Type = SecuritySchemeType.ApiKey,
+                        Scheme = "Bearer",
+                        BearerFormat = "JWT",
+                        In = ParameterLocation.Header,
+                        Description = "Enter 'Bearer' [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer w9ADFAqio8bjzlao10385Adjeb\"",
+                    });
+
+                    swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    {
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                }
+                            },
+                            new string[] {}
+                        }
+                    });
                 });
         }
-    
+
         /// <summary>
         /// Set the auth cookie policy.
         /// </summary>

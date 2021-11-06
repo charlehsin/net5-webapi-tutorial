@@ -54,7 +54,7 @@ Then you can use 1 of the following to authenticate:
 
 ### Basic
 
-- commit ??
+- commit f4926516547488cb97d141d0d5d1d35b2acb6a94
 - Use Entity Framework Core and migration to create the basic identiy database tables. Then new user can be created and then logged in.
 - https://docs.microsoft.com/en-us/aspnet/core/security/authentication/individual?view=aspnetcore-5.0
 - https://www.c-sharpcorner.com/article/authentication-and-authorization-in-asp-net-core-web-api-with-json-web-tokens/

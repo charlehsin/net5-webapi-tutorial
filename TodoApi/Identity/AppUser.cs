@@ -4,6 +4,6 @@ namespace TodoApi.Identity
 {
     public class AppUser : IdentityUser
     {
-        
-    } 
+
+    }
 }

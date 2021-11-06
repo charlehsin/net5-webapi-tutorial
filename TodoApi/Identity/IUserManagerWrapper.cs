@@ -49,7 +49,7 @@ namespace TodoApi.Identity
         /// </summary>
         /// <returns>users</returns>
         IQueryable<AppUser> GetUsers();
-        
+
         /// <summary>
         /// Add the role to the user.
         /// </summary>
