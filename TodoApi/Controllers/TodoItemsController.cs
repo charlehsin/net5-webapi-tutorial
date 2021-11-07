@@ -194,7 +194,7 @@ namespace TodoApi.Controllers
         /// <param name="todoItem"></param>
         /// <returns>TodoItemDTO object</returns>
         private static TodoItemDTO ItemToDTO(TodoItem todoItem) =>
-            new TodoItemDTO
+            new()
             {
                 Id = todoItem.Id,
                 Name = todoItem.Name,

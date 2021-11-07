@@ -133,7 +133,7 @@ namespace TodoApi
         /// Add Identity.
         /// </summary>
         /// <param name="services"></param>
-        private void AddIdentity(IServiceCollection services)
+        private static void AddIdentity(IServiceCollection services)
         {
             services.AddIdentity<AppUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -144,29 +144,29 @@ namespace TodoApi
         /// Set up Swagger.
         /// </summary>
         /// <param name="services"></param>
-        private void AddSwagger(IServiceCollection services)
+        private static void AddSwagger(IServiceCollection services)
         {
-            services.AddSwaggerGen(swagger =>
-                {
-                    swagger.SwaggerDoc("v1", new OpenApiInfo
-                    {
-                        Title = "TodoApi",
-                        Version = "v1",
-                        Description = "A simple example ASP.NET 5 Web API"
-                    });
+            _ = services.AddSwaggerGen(swagger =>
+                  {
+                      swagger.SwaggerDoc("v1", new OpenApiInfo
+                      {
+                          Title = "TodoApi",
+                          Version = "v1",
+                          Description = "A simple example ASP.NET 5 Web API"
+                      });
 
-                    swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
-                    {
-                        Name = "Authorization",
-                        Type = SecuritySchemeType.ApiKey,
-                        Scheme = "Bearer",
-                        BearerFormat = "JWT",
-                        In = ParameterLocation.Header,
-                        Description = "Enter 'Bearer' [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer w9ADFAqio8bjzlao10385Adjeb\"",
-                    });
+                      swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                      {
+                          Name = "Authorization",
+                          Type = SecuritySchemeType.ApiKey,
+                          Scheme = "Bearer",
+                          BearerFormat = "JWT",
+                          In = ParameterLocation.Header,
+                          Description = "Enter 'Bearer' [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer w9ADFAqio8bjzlao10385Adjeb\"",
+                      });
 
-                    swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
-                    {
+                      swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
+                      {
                         {
                             new OpenApiSecurityScheme
                             {
@@ -176,22 +176,22 @@ namespace TodoApi
                                     Id = "Bearer"
                                 }
                             },
-                            new string[] {}
+                            Array.Empty<string>()
                         }
-                    });
+                      });
 
                     // Set the comments path for the Swagger JSON and UI.
                     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                    swagger.IncludeXmlComments(xmlPath);
-                });
+                      var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                      swagger.IncludeXmlComments(xmlPath);
+                  });
         }
 
         /// <summary>
         /// Set the auth cookie policy.
         /// </summary>
         /// <param name="app"></param>
-        private void SetAuthCookiePolicy(IApplicationBuilder app)
+        private static void SetAuthCookiePolicy(IApplicationBuilder app)
         {
             app.UseCookiePolicy(new CookiePolicyOptions
             {

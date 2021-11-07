@@ -62,7 +62,7 @@ namespace TodoApi.Tests
 
             IEnumerable<TodoItemDTO> enumerable = actionResult.Value as IEnumerable<TodoItemDTO>;
             var result = enumerable.ToList();
-            Assert.AreEqual(1, result.Count());
+            Assert.AreEqual(1, result.Count);
             Assert.AreEqual(1, result[0].Id);
             Assert.AreEqual("N1", result[0].Name);
             Assert.AreEqual(true, result[0].IsComplete);

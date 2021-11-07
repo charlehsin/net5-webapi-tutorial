@@ -105,7 +105,7 @@ namespace TodoApi.Controllers
                 result = await _userManagerWrapper.AddToRoleAsync(appUser, userRegister.Role.ToString());
                 if (!result.Succeeded)
                 {
-                    _logger.Log(LogLevel.Warning, $"Fails to add the user to role {userRegister.Role.ToString()}.");
+                    _logger.Log(LogLevel.Warning, $"Fails to add the user to role {userRegister.Role}.");
                 }
             }
 
