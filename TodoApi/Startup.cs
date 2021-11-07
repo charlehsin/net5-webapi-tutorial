@@ -1,4 +1,8 @@
 using System.Text;
+using System.Reflection;
+using System.IO;
+using System;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -29,7 +33,12 @@ namespace TodoApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                // Use string, instead of integer, for enum.
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
 
             AddAuthentication(services);
             AddIdentity(services);
@@ -44,9 +53,10 @@ namespace TodoApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TodoApi v1"));
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TodoApi v1"));
 
             app.UseHttpsRedirection();
 
@@ -80,13 +90,13 @@ namespace TodoApi
                         x.RequireHttpsMetadata = false;
                         x.SaveToken = true;
                         x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                            {
-                                ValidateIssuerSigningKey = true,
-                                ValidateIssuer = false,
-                                ValidateAudience = false,
-                                IssuerSigningKey = new SymmetricSecurityKey(
+                        {
+                            ValidateIssuerSigningKey = true,
+                            ValidateIssuer = false,
+                            ValidateAudience = false,
+                            IssuerSigningKey = new SymmetricSecurityKey(
                                     Encoding.ASCII.GetBytes(Configuration["JWT:Secret"]))
-                            };
+                        };
                     });
         }
 
@@ -138,7 +148,12 @@ namespace TodoApi
         {
             services.AddSwaggerGen(swagger =>
                 {
-                    swagger.SwaggerDoc("v1", new OpenApiInfo { Title = "TodoApi", Version = "v1" });
+                    swagger.SwaggerDoc("v1", new OpenApiInfo
+                    {
+                        Title = "TodoApi",
+                        Version = "v1",
+                        Description = "A simple example ASP.NET 5 Web API"
+                    });
 
                     swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
                     {
@@ -164,6 +179,11 @@ namespace TodoApi
                             new string[] {}
                         }
                     });
+
+                    // Set the comments path for the Swagger JSON and UI.
+                    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                    swagger.IncludeXmlComments(xmlPath);
                 });
         }
 
@@ -174,9 +194,9 @@ namespace TodoApi
         private void SetAuthCookiePolicy(IApplicationBuilder app)
         {
             app.UseCookiePolicy(new CookiePolicyOptions
-                {
-                    MinimumSameSitePolicy = SameSiteMode.Lax,
-                });
+            {
+                MinimumSameSitePolicy = SameSiteMode.Lax,
+            });
         }
     }
 }

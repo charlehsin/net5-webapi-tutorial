@@ -16,19 +16,18 @@ Then you can use 1 of the following to authenticate:
 - Use "POST api/Users/authenticate/cookie" API to authenticate and use "POST api/Users/signout/cookie" to sign out.
 - Use "POST api/Users/authenticate/jwt" API and Swagger's Authenticate button to authenticate.
 
+You can find the added codes for each of the topics below in each commit.
+
 ## Initial tutorial
 
-- commit 0fdf741fbae4b9706bd048732307b3c152f0ed92
 - https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-web-api?view=aspnetcore-5.0&tabs=visual-studio-code
 
 ## Dependency injection
 
-- commit 688e90f393c851fc3dbe5fa2e68d11e8400c5e45
 - https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-5.0
 
 ## JWT bearer token auth
 
-- commit 341c847a152f1651d47fac810e6dcd18f571c76c
 - https://docs.microsoft.com/en-us/aspnet/core/security/authentication/?view=aspnetcore-5.0
 - https://www.c-sharpcorner.com/article/asp-net-core-web-api-5-0-authentication-using-jwtjson-base-token/
    - dotnet add package Microsoft.AspNetCore.Authentication
@@ -39,22 +38,25 @@ Then you can use 1 of the following to authenticate:
 
 ## Logging in ASP.NET Core
 
-- commit 3265786f649dda1bb9168d05e84d2ed051b6236e
 - https://docs.microsoft.com/en-us/dotnet/core/extensions/logging-providers
 - https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-5.0
 
 ## Cookie auth
 
-- commit 113b690de388c0802a6f0727e22120a08e0a0bd8
 - https://docs.microsoft.com/en-us/aspnet/core/security/authentication/cookie?view=aspnetcore-5.0
    - https://docs.microsoft.com/en-us/aspnet/core/security/authorization/limitingidentitybyscheme?view=aspnetcore-5.0&tabs=aspnetcore2x
 - https://www.c-sharpcorner.com/article/cookie-authentication-in-asp-net-core/ 
+
+## Swashbuckle
+
+- https://docs.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-5.0&tabs=visual-studio-code
+- https://docs.microsoft.com/en-us/aspnet/core/web-api/action-return-types?view=aspnetcore-5.0
+- https://medium.com/@jrhodes.home/exposing-enums-through-swagger-in-net-core-api-616d3727a02c
 
 ## Identity
 
 ### Basic
 
-- commit f4926516547488cb97d141d0d5d1d35b2acb6a94
 - Use Entity Framework Core and migration to create the basic identiy database tables. Then new user can be created and then logged in.
 - https://docs.microsoft.com/en-us/aspnet/core/security/authentication/individual?view=aspnetcore-5.0
 - https://www.c-sharpcorner.com/article/authentication-and-authorization-in-asp-net-core-web-api-with-json-web-tokens/
@@ -66,7 +68,6 @@ Then you can use 1 of the following to authenticate:
 
 ### Advanced
 
-- commit ??
 - https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-configuration?view=aspnetcore-5.0
 - https://docs.microsoft.com/en-us/aspnet/core/security/authorization/roles?view=aspnetcore-5.0
 

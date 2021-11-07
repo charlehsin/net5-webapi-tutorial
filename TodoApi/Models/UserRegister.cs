@@ -18,7 +18,6 @@ namespace TodoApi.Models
         public string Password { get; set; }
 
         [Required(ErrorMessage = "Role is required")]
-        [EnumDataType(typeof(UserRole.Roles))]
         public UserRole.Roles Role { get; set; }
     }
 }

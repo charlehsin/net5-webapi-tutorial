@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -28,8 +30,16 @@ namespace TodoApi.Controllers
             _logger = logger;
         }
 
-        // GET: api/TodoItems
+        /// <summary>
+        /// Get all the items.
+        /// </summary>
+        /// <returns>List of items</returns>
+        /// <response code="200">Returns the list of items</response>
+        /// <response code="401">If this is not authorized</response>
         [HttpGet]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<IEnumerable<TodoItemDTO>>> GetTodoItemsAsync()
         {
             var parsedClaim = _myClaim.ParseAuthClaim(HttpContext);
@@ -40,8 +50,19 @@ namespace TodoApi.Controllers
             return items.Select(x => ItemToDTO(x)).ToList();
         }
 
-        // GET: api/TodoItems/5
+        /// <summary>
+        /// Get the target item.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>The target item</returns>
+        /// <response code="200">Returns the target item</response>
+        /// <response code="401">If this is not authorized</response>
+        /// <response code="404">If the target item does not exist</response>
         [HttpGet("{id}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<TodoItemDTO>> GetTodoItemByIdAsync(long id)
         {
             var parsedClaim = _myClaim.ParseAuthClaim(HttpContext);
@@ -57,9 +78,23 @@ namespace TodoApi.Controllers
             return ItemToDTO(todoItem);
         }
 
-        // PUT: api/TodoItems/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Update the target item.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="todoItemDTO"></param>
+        /// <returns></returns>
+        /// <response code="204">If the item is updated</response>
+        /// <response code="400">If the id does not match the item id</response>
+        /// <response code="401">If this is not authorized</response>
+        /// <response code="404">If the target item does not exist</response>
         [HttpPut("{id}")]
+        [Consumes(MediaTypeNames.Application.Json)]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateTodoItemAsync(long id, TodoItemDTO todoItemDTO)
         {
             var parsedClaim = _myClaim.ParseAuthClaim(HttpContext);
@@ -94,10 +129,19 @@ namespace TodoApi.Controllers
             return NoContent();
         }
 
-        // POST: api/TodoItems
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Create a new item.
+        /// </summary>
+        /// <param name="todoItemDTO"></param>
+        /// <returns></returns>
+        /// <response code="201">Returns the newly created item</response>
+        /// <response code="401">If this is not authorized</response>
         [HttpPost]
         [ActionName("CreateTodoItemAsync")]
+        [Consumes(MediaTypeNames.Application.Json)]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<TodoItemDTO>> CreateTodoItemAsync(TodoItemDTO todoItemDTO)
         {
             var parsedClaim = _myClaim.ParseAuthClaim(HttpContext);
@@ -114,8 +158,19 @@ namespace TodoApi.Controllers
             return CreatedAtAction(nameof(CreateTodoItemAsync), ItemToDTO(todoItem));
         }
 
-        // DELETE: api/TodoItems/5
+        /// <summary>
+        /// Delete the target item.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <response code="204">If the item is deleted</response>
+        /// <response code="401">If this is not authorized</response>
+        /// <response code="404">If the target item does not exist</response>
         [HttpDelete("{id}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteTodoItemAsync(long id)
         {
             var parsedClaim = _myClaim.ParseAuthClaim(HttpContext);
