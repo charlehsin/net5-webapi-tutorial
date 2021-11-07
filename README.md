@@ -4,6 +4,11 @@
 
 This includes sample codes for ASP.NET Web API and for unit testing.
 
+## GitHub Actions
+
+- DOTNET build and test
+- CodeQL
+
 ## Visual Studio Code extensions
 
 - https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp
