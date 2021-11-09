@@ -130,7 +130,7 @@ namespace TodoApi
         }
 
         /// <summary>
-        /// Add Identity.
+        /// Add and configure Identity.
         /// </summary>
         /// <param name="services"></param>
         private static void AddIdentity(IServiceCollection services)
@@ -138,6 +138,31 @@ namespace TodoApi
             services.AddIdentity<AppUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                // Default Lockout settings.
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.AllowedForNewUsers = true;
+
+                // Default Password settings.
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequiredLength = 6;
+                options.Password.RequiredUniqueChars = 1;
+
+                // Default SignIn settings.
+                options.SignIn.RequireConfirmedEmail = false;
+                options.SignIn.RequireConfirmedPhoneNumber = false;
+
+                // Default User settings.
+                options.User.AllowedUserNameCharacters =
+                        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                options.User.RequireUniqueEmail = true;
+            });
         }
 
         /// <summary>
@@ -180,8 +205,8 @@ namespace TodoApi
                         }
                       });
 
-                    // Set the comments path for the Swagger JSON and UI.
-                    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                      // Set the comments path for the Swagger JSON and UI.
+                      var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                       var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                       swagger.IncludeXmlComments(xmlPath);
                   });

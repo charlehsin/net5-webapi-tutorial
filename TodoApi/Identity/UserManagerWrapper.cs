@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,6 +23,26 @@ namespace TodoApi.Identity
         public async Task<bool> CheckPasswordAsync(AppUser user, string password)
         {
             return await _userManager.CheckPasswordAsync(user, password);
+        }
+
+        public async Task<bool> IsLockedOutAsync(AppUser user)
+        {
+            return await _userManager.IsLockedOutAsync(user);
+        }
+
+        public async Task<IdentityResult> ResetAccessFailedCountAsync(AppUser user)
+        {
+            return await _userManager.ResetAccessFailedCountAsync(user);
+        }
+
+        public async Task<IdentityResult> AccessFailedAsync(AppUser user)
+        {
+            return await _userManager.AccessFailedAsync(user);
+        }
+
+        public async Task<IdentityResult> SetLockoutEndDateAsync(AppUser user, DateTimeOffset? lockoutEnd)
+        {
+            return await _userManager.SetLockoutEndDateAsync(user, lockoutEnd);
         }
 
         public async Task<IdentityResult> DeleteAsync(AppUser user)

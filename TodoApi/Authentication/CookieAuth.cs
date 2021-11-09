@@ -7,22 +7,13 @@ using Microsoft.AspNetCore.Http;
 
 namespace TodoApi.Authentication
 {
-    public class CookieAuth: ICookieAuth
+    public class CookieAuth: GeneralAuth, ICookieAuth
     {
         public async Task SignInAsync(string userName, IList<string> roles,
             HttpContext context)
         {
-            var authClaims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, userName)
-                };
-            foreach (var role in roles)
-            {
-                authClaims.Add(new Claim(ClaimTypes.Role, role));
-            }
-
             var claimsIdentity = new ClaimsIdentity(
-                authClaims,
+                GetAuthClaims(userName, roles),
                 CookieAuthenticationDefaults.AuthenticationScheme);
 
             var authProperties = new AuthenticationProperties
