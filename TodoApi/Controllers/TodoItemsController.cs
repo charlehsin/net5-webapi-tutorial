@@ -13,7 +13,11 @@ using TodoApi.Repositories;
 
 namespace TodoApi.Controllers
 {
+    /// <summary>
+    /// This is the examples controller to manage Todo items.
+    /// </summary>
     [Authorize(AuthenticationSchemes = GeneralAuth.AuthSchemes)]
+    [Authorize(Roles = UserRole.RoleAdminOrUser)]
     [Route("api/[controller]")]
     [ApiController]
     public class TodoItemsController : ControllerBase
@@ -33,6 +37,9 @@ namespace TodoApi.Controllers
         /// <summary>
         /// Get all the items.
         /// </summary>
+        /// <remarks>
+        /// This requires a user with Admin role or with User role.
+        /// </remarks>
         /// <returns>List of items</returns>
         /// <response code="200">Returns the list of items</response>
         /// <response code="401">If this is not authorized</response>
@@ -53,6 +60,9 @@ namespace TodoApi.Controllers
         /// <summary>
         /// Get the target item.
         /// </summary>
+        /// <remarks>
+        /// This requires a user with Admin role or with User role.
+        /// </remarks>
         /// <param name="id"></param>
         /// <returns>The target item</returns>
         /// <response code="200">Returns the target item</response>
@@ -81,6 +91,9 @@ namespace TodoApi.Controllers
         /// <summary>
         /// Update the target item.
         /// </summary>
+        /// <remarks>
+        /// This requires a user with Admin role or with User role.
+        /// </remarks>
         /// <param name="id"></param>
         /// <param name="todoItemDTO"></param>
         /// <returns></returns>
@@ -132,6 +145,9 @@ namespace TodoApi.Controllers
         /// <summary>
         /// Create a new item.
         /// </summary>
+        /// <remarks>
+        /// This requires a user with Admin role or with User role.
+        /// </remarks>
         /// <param name="todoItemDTO"></param>
         /// <returns></returns>
         /// <response code="201">Returns the newly created item</response>
@@ -161,6 +177,9 @@ namespace TodoApi.Controllers
         /// <summary>
         /// Delete the target item.
         /// </summary>
+        /// <remarks>
+        /// This requires a user with Admin role or with User role.
+        /// </remarks>
         /// <param name="id"></param>
         /// <returns></returns>
         /// <response code="204">If the item is deleted</response>

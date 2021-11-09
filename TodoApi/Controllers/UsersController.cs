@@ -14,7 +14,11 @@ using TodoApi.Identity;
 
 namespace TodoApi.Controllers
 {
+    /// <summary>
+    /// This is the examples controller to manage users and authentication.
+    /// </summary>
     [Authorize(AuthenticationSchemes = GeneralAuth.AuthSchemes)]
+    [Authorize(Roles = UserRole.RoleAdminOrUser)]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -43,9 +47,9 @@ namespace TodoApi.Controllers
         /// </summary>
         /// <remarks>
         /// The password requires an uppercase character, lowercase character, a digit, and a non-alphanumeric character. Passwords must be at least six characters long.
-        /// 
+        ///
         /// Each user requires a unique email address.
-        /// 
+        ///
         /// For tutorial and ease of testing purpose, this API does not require authentication.
         /// </remarks>
         /// <param name="userRegister"></param>
@@ -175,6 +179,9 @@ namespace TodoApi.Controllers
         /// <summary>
         /// Get all the users.
         /// </summary>
+        /// <remarks>
+        /// This requires a user with Admin role or with User role.
+        /// </remarks>
         /// <returns>List of users</returns>
         /// <response code="200">Returns the list of users</response>
         /// <response code="401">If this is not authorized</response>
@@ -199,14 +206,20 @@ namespace TodoApi.Controllers
         /// <summary>
         /// Unlock a user.
         /// </summary>
+        /// <remarks>
+        /// This requires a user with Admin role.
+        /// </remarks>
         /// <param name="id"></param>
         /// <returns></returns>
         /// <response code="204">If the user is unlocked successfully</response>
+        /// <response code="403">If the user role is allowed</response>
         /// <response code="404">If the user id does not exist</response>
         /// <response code="500">If the user unlocking fails</response>
+        [Authorize(Roles = UserRole.RoleAdmin)]
         [HttpPost("{id}/unlock")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UnlockUserAsync(string id)
@@ -298,6 +311,9 @@ namespace TodoApi.Controllers
         /// <summary>
         /// Sign out and delete the auth cookie.
         /// </summary>
+        /// <remarks>
+        /// This requires a user with Admin role or with User role.
+        /// </remarks>
         /// <returns></returns>
         /// <response code="204">If the user is signed out and the auth cookie is deleted</response>
         /// <response code="401">If this is not authorized</response>
