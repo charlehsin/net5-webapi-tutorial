@@ -8,7 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace TodoApi.Authentication
 {
-    public class JwtAuth: IJwtAuth
+    public class JwtAuth: GeneralAuth, IJwtAuth 
     {
         private readonly string _key;
 
@@ -23,19 +23,10 @@ namespace TodoApi.Authentication
 
             var tokenKey = Encoding.ASCII.GetBytes(_key);
 
-            var authClaims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, userName)
-                };
-            foreach (var role in roles)
-            {
-                authClaims.Add(new Claim(ClaimTypes.Role, role));
-            }
-
             var securityTokenDescriptor = new SecurityTokenDescriptor()
             {
                 Subject = new ClaimsIdentity(
-                    authClaims,
+                    GetAuthClaims(userName, roles),
                     JwtBearerDefaults.AuthenticationScheme),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(

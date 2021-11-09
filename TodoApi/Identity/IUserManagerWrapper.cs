@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,6 +23,36 @@ namespace TodoApi.Identity
         /// <param name="password"></param>
         /// <returns>True if it is valid.</returns>
         Task<bool> CheckPasswordAsync(AppUser user, string password);
+
+        /// <summary>
+        /// Check if the user is locked out.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns>Ture if it is locked out.</returns>
+        Task<bool> IsLockedOutAsync(AppUser user);
+
+        /// <summary>
+        /// Resets the access failed count for the target user.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns>IdentityResult</returns>
+        Task<IdentityResult> ResetAccessFailedCountAsync(AppUser user);
+
+        /// <summary>
+        /// Increments the access failed count for the user as an asynchronous operation.
+        /// If the failed access account is greater than or equal to the configured maximum number of attempts, the user will be locked out for the configured lockout time span.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns>IdentityResult</returns>
+        Task<IdentityResult> AccessFailedAsync(AppUser user);
+
+        /// <summary>
+        /// Locks out a user until the specified end date has passed. Setting a end date in the past immediately unlocks a user.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="lockoutEnd"></param>
+        /// <returns>IdentityResult</returns>
+        Task<IdentityResult> SetLockoutEndDateAsync(AppUser user, DateTimeOffset? lockoutEnd);
 
         /// <summary>
         /// Delete the target user.

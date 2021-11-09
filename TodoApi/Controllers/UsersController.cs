@@ -42,6 +42,10 @@ namespace TodoApi.Controllers
         /// Create a new user.
         /// </summary>
         /// <remarks>
+        /// The password requires an uppercase character, lowercase character, a digit, and a non-alphanumeric character. Passwords must be at least six characters long.
+        /// 
+        /// Each user requires a unique email address.
+        /// 
         /// For tutorial and ease of testing purpose, this API does not require authentication.
         /// </remarks>
         /// <param name="userRegister"></param>
@@ -126,7 +130,7 @@ namespace TodoApi.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         /// <response code="204">If the user is deleted successfully</response>
-        /// <response code="404">If the user name does not exist</response>
+        /// <response code="404">If the user id does not exist</response>
         /// <response code="500">If the user deletion fails</response>
         [AllowAnonymous]
         [HttpDelete("{id}")]
@@ -193,6 +197,50 @@ namespace TodoApi.Controllers
         }
 
         /// <summary>
+        /// Unlock a user.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <response code="204">If the user is unlocked successfully</response>
+        /// <response code="404">If the user id does not exist</response>
+        /// <response code="500">If the user unlocking fails</response>
+        [HttpPost("{id}/unlock")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UnlockUserAsync(string id)
+        {
+            var parsedClaim = _myClaim.ParseAuthClaim(HttpContext);
+
+            var user = await _userManagerWrapper.FindByIdAsync(id);
+            if (user == null)
+            {
+                _logger.Log(LogLevel.Debug, $"User {parsedClaim.UserName} tries to unlock a user with id {id} that does not exist.");
+                return NotFound();
+            }
+
+            var result = await _userManagerWrapper.ResetAccessFailedCountAsync(user);
+            if (!result.Succeeded)
+            {
+                _logger.Log(LogLevel.Error, $"User {parsedClaim.UserName} cannot reset the access failed count for the user with id {id}.");
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response { Message = "Cannot unlock the user." });
+            }
+
+            result = await _userManagerWrapper.SetLockoutEndDateAsync(user, null);
+            if (!result.Succeeded)
+            {
+                _logger.Log(LogLevel.Error, $"User {parsedClaim.UserName} cannot set the lockout end date for the user with id {id}.");
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response { Message = "Cannot unlock the user." });
+            }
+
+            _logger.Log(LogLevel.Debug, $"User {parsedClaim.UserName} unlocked a user with id {id}.");
+            return NoContent();
+        }
+
+        /// <summary>
         /// Authenticate the user and get the JWT.
         /// </summary>
         /// <param name="userCredential"></param>
@@ -206,16 +254,9 @@ namespace TodoApi.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> AuthenticateAsJwtAsync([FromBody] UserCredential userCredential)
         {
-            var user = await _userManagerWrapper.FindByNameAsync(userCredential.UserName);
+            var user = await TryAuthenticateAsync(userCredential).ConfigureAwait(false);
             if (user == null)
             {
-                _logger.Log(LogLevel.Debug, $"User {userCredential.UserName} cannot be authenticated because the user does not exist.");
-                return Unauthorized();
-            }
-
-            if (!await _userManagerWrapper.CheckPasswordAsync(user, userCredential.Password))
-            {
-                _logger.Log(LogLevel.Debug, $"User {userCredential.UserName} cannot be authenticated because the password is not correct.");
                 return Unauthorized();
             }
 
@@ -241,16 +282,9 @@ namespace TodoApi.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> AuthenticateAsCookieAsync([FromBody] UserCredential userCredential)
         {
-            var user = await _userManagerWrapper.FindByNameAsync(userCredential.UserName);
+            var user = await TryAuthenticateAsync(userCredential).ConfigureAwait(false);
             if (user == null)
             {
-                _logger.Log(LogLevel.Debug, $"User {userCredential.UserName} cannot be authenticated because the user does not exist.");
-                return Unauthorized();
-            }
-
-            if (!await _userManagerWrapper.CheckPasswordAsync(user, userCredential.Password))
-            {
-                _logger.Log(LogLevel.Debug, $"User {userCredential.UserName} cannot be authenticated because the password is not correct.");
                 return Unauthorized();
             }
 
@@ -277,6 +311,57 @@ namespace TodoApi.Controllers
             _logger.Log(LogLevel.Information, $"User {parsedClaim.UserName} is signing out.");
             await _cookieAuth.SignOutAsync(HttpContext);
             return NoContent();
+        }
+
+        /// <summary>
+        /// Try to authenticate with the target credential.
+        /// We also check if the user is locked out or not.
+        /// </summary>
+        /// <param name="userCredential"></param>
+        /// <returns>AppUser</returns>
+        private async Task<AppUser> TryAuthenticateAsync(UserCredential userCredential)
+        {
+            var user = await _userManagerWrapper.FindByNameAsync(userCredential.UserName);
+            if (user == null)
+            {
+                _logger.Log(LogLevel.Debug, $"User {userCredential.UserName} cannot be authenticated because the user does not exist.");
+                return null;
+            }
+
+            var isLockedOut = await _userManagerWrapper.IsLockedOutAsync(user);
+            if (isLockedOut)
+            {
+                _logger.Log(LogLevel.Debug, $"User {userCredential.UserName} cannot be authenticated because the user is locked out.");
+                return null;
+            }
+
+            IdentityResult result;
+            if (!await _userManagerWrapper.CheckPasswordAsync(user, userCredential.Password))
+            {
+                _logger.Log(LogLevel.Debug, $"User {userCredential.UserName} cannot be authenticated because the password is not correct.");
+
+                result = await _userManagerWrapper.AccessFailedAsync(user);
+                if (!result.Succeeded)
+                {
+                    _logger.Log(LogLevel.Error, $"Cannot increment the access failed account for User {userCredential.UserName}.");
+                }
+
+                isLockedOut = await _userManagerWrapper.IsLockedOutAsync(user);
+                if (isLockedOut)
+                {
+                    _logger.Log(LogLevel.Debug, $"User {userCredential.UserName} is locked out.");
+                }
+
+                return null;
+            }
+
+            result = await _userManagerWrapper.ResetAccessFailedCountAsync(user);
+            if (!result.Succeeded)
+            {
+                _logger.Log(LogLevel.Error, $"Cannot reset the access failed account for User {userCredential.UserName}.");
+            }
+
+            return user;
         }
     }
 }
