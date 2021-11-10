@@ -1,4 +1,4 @@
-# Tutorial codes for unit testing for TodoApi
+# Tutorial and sample codes for unit testing
 
 ## Basic unit testing 
 
@@ -12,7 +12,7 @@
 - https://github.com/Moq/moq4/wiki/Quickstart 
 - https://stackoverflow.com/questions/28581322/moq-with-task-await 
 
-## ASP related
+## ASP.NET related
 
 - https://docs.microsoft.com/en-us/aspnet/web-api/overview/testing-and-debugging/unit-testing-controllers-in-web-api
 
@@ -33,3 +33,7 @@
 - (coverage) dotnet test --collect:"XPlat Code Coverage"
 - (install coverage report tool) dotnet tool install -g dotnet-reportgenerator-globaltool
 - (coverage report) reportgenerator -reports:"C:\Codes\net5-webapi-tutorial\TodoApi.Tests\TestResults\334eb5b6-f525-432a-ad59-97204b5a498b\coverage.cobertura.xml" -targetdir:"CoverageResults" -reporttypes:Html
+
+## Useful Visual Studio Code extensions
+
+- https://marketplace.visualstudio.com/items?itemName=formulahendry.dotnet-test-explorer

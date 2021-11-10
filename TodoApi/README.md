@@ -1,4 +1,4 @@
-# Tutorial codes for TodoApi
+# Tutorial and sample codes for Web API
 
 ## Overview
 
@@ -16,7 +16,21 @@ Then you can use 1 of the following to authenticate:
 - Use "POST api/Users/authenticate/cookie" API to authenticate and use "POST api/Users/signout/cookie" to sign out.
 - Use "POST api/Users/authenticate/jwt" API and Swagger's Authenticate button to authenticate.
 
+In the sample codes, we use 2 different DbContext for tutorial purpose:
+- For TodoItems, we use in-memory database.
+- For Users, we use Sqlite.
+
 You can find the added codes for each of the topics below in each commit.
+
+## Folder structure
+
+- Authentication folder: Handle JWT, auth cookie, and claim.
+- Controllers folder: API controllers
+- Data folder: Data context class for users.
+   - Migrations folder: Use Entity Framework Core to create the Sqlite database tables.
+- Identity folder: Define the AppUser class for Entity Framework Core, and define wrappers for ASP Identity's UserManager and RoleManager.
+- Models folder: Define some data classes used by API.
+- Repositories folder: Handle the storage operations. For users, we do not create repository directly since we are using ASP Identity.
 
 ## Initial tutorial
 

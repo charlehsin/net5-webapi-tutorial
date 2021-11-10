@@ -1,18 +1,19 @@
-# Tutorial for ASP.NET 5 Web API
+# Tutorial and sample codes for ASP.NET 5 Web API
 
 ## Overview
 
-This includes sample codes for ASP.NET Web API and for unit testing.
+This includes tutorial and sample codes for the following
+- ASP.NET 5 Web API in TodoApi folder
+- Unit testing in TodoApi.Tests folder
 
-## GitHub Actions
+## GitHub Actions included
 
 - DOTNET build and test
 - CodeQL
 
-## Visual Studio Code extensions
+## Useful Visual Studio Code extensions
 
 - https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp
-- https://marketplace.visualstudio.com/items?itemName=formulahendry.dotnet-test-explorer
 - https://marketplace.visualstudio.com/items?itemName=donjayamanne.githistory
 
 ## Useful Visual Studio Code references
