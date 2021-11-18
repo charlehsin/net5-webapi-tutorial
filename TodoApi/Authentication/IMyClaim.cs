@@ -8,15 +8,15 @@ namespace TodoApi.Authentication
         /// <summary>
         /// Parse the authentication claim.
         /// </summary>
-        /// <param name="context"></param>
-        /// <returns>ParsedClaim</returns>
+        /// <param name="context">The HttpContext.</param>
+        /// <returns>The ParsedClaim object.</returns>
         ParsedClaim ParseAuthClaim(HttpContext context);
 
         /// <summary>
         /// Parse the authentication claim.
         /// </summary>
-        /// <param name="principal"></param>
-        /// <returns>ParsedClaim</returns>
+        /// <param name="principal">The ClaimsPrincipal.</param>
+        /// <returns>The ParsedClaim object.</returns>
         ParsedClaim ParseAuthClaim(ClaimsPrincipal principal);
     }
 }

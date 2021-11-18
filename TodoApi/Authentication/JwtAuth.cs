@@ -8,7 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace TodoApi.Authentication
 {
-    public class JwtAuth: GeneralAuth, IJwtAuth 
+    public class JwtAuth : GeneralAuth, IJwtAuth
     {
         private readonly string _key;
 
@@ -19,7 +19,7 @@ namespace TodoApi.Authentication
 
         public string GetToken(string userName, IList<string> roles)
         {
-            var jwtSecutiryTokenHandler = new JwtSecurityTokenHandler();
+            var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
 
             var tokenKey = Encoding.ASCII.GetBytes(_key);
 
@@ -33,9 +33,9 @@ namespace TodoApi.Authentication
                     new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha512Signature)
             };
 
-            var token = jwtSecutiryTokenHandler.CreateToken(securityTokenDescriptor);
+            var token = jwtSecurityTokenHandler.CreateToken(securityTokenDescriptor);
 
-            return jwtSecutiryTokenHandler.WriteToken(token);
+            return jwtSecurityTokenHandler.WriteToken(token);
         }
     }
 }

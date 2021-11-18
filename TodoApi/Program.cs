@@ -12,6 +12,7 @@ namespace TodoApi
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
+            // The user secrets configuration source is automatically added in Development mode when the project calls CreateDefaultBuilder.
             Host.CreateDefaultBuilder(args)
                 .ConfigureLogging(logging =>
                 {

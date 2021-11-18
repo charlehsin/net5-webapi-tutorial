@@ -40,9 +40,9 @@ namespace TodoApi.Controllers
         /// <remarks>
         /// This requires a user with Admin role or with User role.
         /// </remarks>
-        /// <returns>List of items</returns>
-        /// <response code="200">Returns the list of items</response>
-        /// <response code="401">If this is not authorized</response>
+        /// <returns>The list of items.</returns>
+        /// <response code="200">Returns the list of items.</response>
+        /// <response code="401">If this is not authorized.</response>
         [HttpGet]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -63,11 +63,11 @@ namespace TodoApi.Controllers
         /// <remarks>
         /// This requires a user with Admin role or with User role.
         /// </remarks>
-        /// <param name="id"></param>
-        /// <returns>The target item</returns>
-        /// <response code="200">Returns the target item</response>
-        /// <response code="401">If this is not authorized</response>
-        /// <response code="404">If the target item does not exist</response>
+        /// <param name="id">The TodoItem ID.</param>
+        /// <returns>The target item.</returns>
+        /// <response code="200">Returns the target item.</response>
+        /// <response code="401">If this is not authorized.</response>
+        /// <response code="404">If the target item does not exist.</response>
         [HttpGet("{id}")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -94,13 +94,13 @@ namespace TodoApi.Controllers
         /// <remarks>
         /// This requires a user with Admin role or with User role.
         /// </remarks>
-        /// <param name="id"></param>
-        /// <param name="todoItemDTO"></param>
+        /// <param name="id">The TodoItem ID.</param>
+        /// <param name="todoItemDTO">The TodoItemDTO object with the updated info.</param>
         /// <returns></returns>
-        /// <response code="204">If the item is updated</response>
-        /// <response code="400">If the id does not match the item id</response>
-        /// <response code="401">If this is not authorized</response>
-        /// <response code="404">If the target item does not exist</response>
+        /// <response code="204">If the item is updated.</response>
+        /// <response code="400">If the id does not match the item id.</response>
+        /// <response code="401">If this is not authorized.</response>
+        /// <response code="404">If the target item does not exist.</response>
         [HttpPut("{id}")]
         [Consumes(MediaTypeNames.Application.Json)]
         [Produces("application/json")]
@@ -148,10 +148,10 @@ namespace TodoApi.Controllers
         /// <remarks>
         /// This requires a user with Admin role or with User role.
         /// </remarks>
-        /// <param name="todoItemDTO"></param>
+        /// <param name="todoItemDTO">The TodoItemDTO object.</param>
         /// <returns></returns>
-        /// <response code="201">Returns the newly created item</response>
-        /// <response code="401">If this is not authorized</response>
+        /// <response code="201">Returns the newly created item.</response>
+        /// <response code="401">If this is not authorized.</response>
         [HttpPost]
         [ActionName("CreateTodoItemAsync")]
         [Consumes(MediaTypeNames.Application.Json)]
@@ -180,11 +180,11 @@ namespace TodoApi.Controllers
         /// <remarks>
         /// This requires a user with Admin role or with User role.
         /// </remarks>
-        /// <param name="id"></param>
+        /// <param name="id">The TodoItem ID.</param>
         /// <returns></returns>
-        /// <response code="204">If the item is deleted</response>
-        /// <response code="401">If this is not authorized</response>
-        /// <response code="404">If the target item does not exist</response>
+        /// <response code="204">If the item is deleted.</response>
+        /// <response code="401">If this is not authorized.</response>
+        /// <response code="404">If the target item does not exist.</response>
         [HttpDelete("{id}")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -210,8 +210,8 @@ namespace TodoApi.Controllers
         /// <summary>
         /// Map TodoItem object to TodoItemDTO object
         /// </summary>
-        /// <param name="todoItem"></param>
-        /// <returns>TodoItemDTO object</returns>
+        /// <param name="todoItem">The TodoItem object.</param>
+        /// <returns>The TodoItemDTO object.</returns>
         private static TodoItemDTO ItemToDTO(TodoItem todoItem) =>
             new()
             {

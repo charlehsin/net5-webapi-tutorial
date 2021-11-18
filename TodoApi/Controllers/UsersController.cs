@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Net.Mime;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -52,10 +54,10 @@ namespace TodoApi.Controllers
         ///
         /// For tutorial and ease of testing purpose, this API does not require authentication.
         /// </remarks>
-        /// <param name="userRegister"></param>
-        /// <returns>A newly created user</returns>
-        /// <response code="201">Returns the newly created item</response>
-        /// <response code="409">If the user name already exists</response>
+        /// <param name="userRegister">The target user UserRegister object.</param>
+        /// <returns>A newly created user.</returns>
+        /// <response code="201">Returns the newly created item.</response>
+        /// <response code="409">If the user name already exists.</response>
         /// <response code="500">If the user creation fails.</response>
         [AllowAnonymous]
         [HttpPost]
@@ -97,7 +99,7 @@ namespace TodoApi.Controllers
                     new Response { Message = "The newly created user still does not exist." });
             }
 
-            // TODO: This available role creation should be moved to other places. This should not be tied to user creatoin.
+            // TODO: This available role creation should be moved to other places. This should not be tied to user creation.
             // Create the available roles if they do not exist yet
             if (!await _roleManagerWrapper.RoleExistsAsync(UserRole.Roles.Admin.ToString()))
             {
@@ -131,11 +133,11 @@ namespace TodoApi.Controllers
         /// <remarks>
         /// For tutorial and ease of testing purpose, this API does not require authentication.
         /// </remarks>
-        /// <param name="id"></param>
+        /// <param name="id">The user ID.</param>
         /// <returns></returns>
-        /// <response code="204">If the user is deleted successfully</response>
-        /// <response code="404">If the user id does not exist</response>
-        /// <response code="500">If the user deletion fails</response>
+        /// <response code="204">If the user is deleted successfully.</response>
+        /// <response code="404">If the user id does not exist.</response>
+        /// <response code="500">If the user deletion fails.</response>
         [AllowAnonymous]
         [HttpDelete("{id}")]
         [Produces("application/json")]
@@ -182,9 +184,9 @@ namespace TodoApi.Controllers
         /// <remarks>
         /// This requires a user with Admin role or with User role.
         /// </remarks>
-        /// <returns>List of users</returns>
-        /// <response code="200">Returns the list of users</response>
-        /// <response code="401">If this is not authorized</response>
+        /// <returns>The list of users.</returns>
+        /// <response code="200">Returns the list of users.</response>
+        /// <response code="401">If this is not authorized.</response>
         [HttpGet]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -193,7 +195,7 @@ namespace TodoApi.Controllers
         {
             var parsedClaim = _myClaim.ParseAuthClaim(HttpContext);
 
-            _logger.Log(LogLevel.Debug, $"User {parsedClaim.UserName} is getting all users.");
+            _logger.Log(LogLevel.Debug, $"User {parsedClaim.UserName} with roles {parsedClaim.Roles} is getting all users.");
 
             return _userManagerWrapper.GetUsers().Select(u => new User
             {
@@ -209,12 +211,12 @@ namespace TodoApi.Controllers
         /// <remarks>
         /// This requires a user with Admin role.
         /// </remarks>
-        /// <param name="id"></param>
+        /// <param name="id">The target user ID.</param>
         /// <returns></returns>
-        /// <response code="204">If the user is unlocked successfully</response>
-        /// <response code="403">If the user role is allowed</response>
-        /// <response code="404">If the user id does not exist</response>
-        /// <response code="500">If the user unlocking fails</response>
+        /// <response code="204">If the user is unlocked successfully.</response>
+        /// <response code="403">If the user role is allowed.</response>
+        /// <response code="404">If the user id does not exist.</response>
+        /// <response code="500">If the user unlocking fails.</response>
         [Authorize(Roles = UserRole.RoleAdmin)]
         [HttpPost("{id}/unlock")]
         [Produces("application/json")]
@@ -256,10 +258,10 @@ namespace TodoApi.Controllers
         /// <summary>
         /// Authenticate the user and get the JWT.
         /// </summary>
-        /// <param name="userCredential"></param>
-        /// <returns>JWT</returns>
-        /// <response code="200">Returns the JWT</response>
-        /// <response code="401">If the user authentication fails</response>
+        /// <param name="userCredential">The UserCredential object.</param>
+        /// <returns>JWT.</returns>
+        /// <response code="200">Returns the JWT.</response>
+        /// <response code="401">If the user authentication fails.</response>
         [AllowAnonymous]
         [HttpPost("authenticate/jwt")]
         [Consumes(MediaTypeNames.Application.Json)]
@@ -283,10 +285,10 @@ namespace TodoApi.Controllers
         /// <summary>
         /// Authenticate the user and create the auth cookie.
         /// </summary>
-        /// <param name="userCredential"></param>
+        /// <param name="userCredential">The UserCredential object.</param>
         /// <returns></returns>
-        /// <response code="204">If the user is authenticated and the auth cookie is created</response>
-        /// <response code="401">If the user authentication fails</response>
+        /// <response code="204">If the user is authenticated and the auth cookie is created.</response>
+        /// <response code="401">If the user authentication fails.</response>
         [AllowAnonymous]
         [HttpPost("authenticate/cookie")]
         [Consumes(MediaTypeNames.Application.Json)]
@@ -309,14 +311,103 @@ namespace TodoApi.Controllers
         }
 
         /// <summary>
+        /// Sign in Facebook and then get the JWT.
+        /// </summary>
+        /// <remarks>
+        /// The authentication flow is the following.
+        ///
+        /// 1. The front-end application sends this "GET" API request.
+        ///
+        /// 2. Upon receiving the request, this method goes to the "challenge" flow. ASP.NET Core's internal FacebookHandler does the real "challenge" flow
+        /// to prepare for the redirection information. The redirection information includes the target provider's AuthorizationEndpoint path, the client-id, and the redirection_uri, etc.
+        /// ASP.NET Core internally uses "/signin-facebook" as the redirection_uri. We do not need to change this. We only need to configure this path at the external
+        /// OAuth 2.0 provider, e.g., Facebook, side. Then Redirection (302) is returned to the front-end application.
+        ///
+        /// 3. The front-end application gets Redirection (302) and redirects to the target Facebook URL to perform the authentication at Facebook.
+        ///
+        /// 4. When Facebook finishes the authentication, it responds with another Redirection (302) to the front-end application. This redirection location is XXXX/signin-facebook.
+        ///
+        /// 5. The front-end application gets Redirection (302) and redirects to our ASP.NET Core Web API. ASP.NET Web API internally will process this XXXX/signin-facebook request,
+        /// by working with the external OAuth 2.0 provider, e.g., Facebook.
+        ///
+        /// 6. After the above is done, ASP.NET Core internally responds with yet another Redirection (302) to the front-end. This time, the redirection location is this "GET" API path.
+        ///
+        /// 7. Then front-end application gets Redirection (302) and redirects to this "GET" API.
+        ///
+        /// 8. Upon receiving the request, this method goes to the "authenticate" flow. And eventually returns with a JWT.
+        /// </remarks>
+        /// <returns>JWT.</returns>
+        /// <response code="200">Returns the JWT.</response>
+        /// <response code="302">If the challenge works, and the authentication redirection location is obtained.</response>
+        /// <response code="401">If the challenge fails because the authentication redirection location cannot be obtained.</response>
+        [AllowAnonymous]
+        [HttpGet("authenticate/facebook")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status302Found)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> SignInFacebookAsync()
+        {
+            var authScheme = FacebookDefaults.AuthenticationScheme;
+
+            // Try to authenticate.
+            var authResult = await Request.HttpContext.AuthenticateAsync(authScheme);
+            if (!authResult.Succeeded
+                || authResult?.Principal == null
+                || !authResult.Principal.Identities.Any(id => id.IsAuthenticated)
+                || string.IsNullOrEmpty(authResult.Properties.GetTokenValue("access_token")))
+            {
+                _logger.Log(LogLevel.Debug, $"Not authenticated via {authScheme} yet. Challenging now....");
+
+                // Challenge the Facebook OAuth 2.0 provider.
+                await Request.HttpContext.ChallengeAsync(authScheme, new AuthenticationProperties
+                {
+                    AllowRefresh = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1),
+                    IssuedUtc = DateTimeOffset.UtcNow,
+                    // We provide this API's own path here so that the final redirection can go to this method.
+                    RedirectUri = Url.Action("SignInFacebookAsync")
+                });
+
+                // Get the location response header.
+                if (Response.Headers.TryGetValue("location", out var locationResponseHeader))
+                {
+                    _logger.Log(LogLevel.Debug, $"Not authenticated via {authScheme} yet. The redirection location is {locationResponseHeader}.");
+                    return Redirect(locationResponseHeader);
+                }
+
+                _logger.Log(LogLevel.Debug, $"Challenge via {authScheme} failed.");
+                return Unauthorized();
+            }
+
+            var claimsIdentity = authResult.Principal.Identities.First(id => id.IsAuthenticated);
+            var email = claimsIdentity.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
+            _logger.Log(LogLevel.Debug, $"User {claimsIdentity.Name} with email {email ?? string.Empty} is authenticated via {authScheme}.");
+
+            // Then you need to get the role and user ID based on the user name.
+            // In real world scenario, you may have other flows to add the target user from external OAuth 2.0 provider into ASP Identity.
+            // This is beyond the scope of this sample codes.
+            // For tutorial purpose here, we will use fixed Admin role.
+
+            // In the API design of this sample codes, the APIs will only accept JWT Bearer authentication or Cookies authentication.
+            // Therefore, we need to get JWT or create the auth cookie.
+            // For tutorial purpose, we use JWT.
+
+            // In real world scenario, you may want to use auth.Properties.ExpiresUtc to set your JWT expiration or auth cookie expiration accordingly.
+
+            var token = _jwtAuth.GetToken(claimsIdentity.Name, new List<string> { UserRole.RoleAdmin });
+            _logger.Log(LogLevel.Information, $"User {claimsIdentity.Name} has the JWT now.");
+            return Ok(token);
+        }
+
+        /// <summary>
         /// Sign out and delete the auth cookie.
         /// </summary>
         /// <remarks>
         /// This requires a user with Admin role or with User role.
         /// </remarks>
         /// <returns></returns>
-        /// <response code="204">If the user is signed out and the auth cookie is deleted</response>
-        /// <response code="401">If this is not authorized</response>
+        /// <response code="204">If the user is signed out and the auth cookie is deleted.</response>
+        /// <response code="401">If this is not authorized.</response>
         [HttpPost("signout/cookie")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -333,8 +424,8 @@ namespace TodoApi.Controllers
         /// Try to authenticate with the target credential.
         /// We also check if the user is locked out or not.
         /// </summary>
-        /// <param name="userCredential"></param>
-        /// <returns>AppUser</returns>
+        /// <param name="userCredential">The UserCredential object.</param>
+        /// <returns>The AppUser.</returns>
         private async Task<AppUser> TryAuthenticateAsync(UserCredential userCredential)
         {
             var user = await _userManagerWrapper.FindByNameAsync(userCredential.UserName);

@@ -14,9 +14,9 @@ namespace TodoApi.Authentication
         /// <summary>
         /// Get the authentication claims.
         /// </summary>
-        /// <param name="userName"></param>
-        /// <param name="roles"></param>
-        /// <returns>list of claims</returns>
+        /// <param name="userName">The target user name.</param>
+        /// <param name="roles">The list of roles this user has.</param>
+        /// <returns>The list of claims.</returns>
         public List<Claim> GetAuthClaims(string userName, IList<string> roles)
         {
             var authClaims = new List<Claim>

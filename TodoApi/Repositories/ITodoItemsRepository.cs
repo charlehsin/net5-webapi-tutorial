@@ -9,27 +9,27 @@ namespace TodoApi.Repositories
         /// <summary>
         /// Get all items.
         /// </summary>
-        /// <returns>List of items</returns>
+        /// <returns>The list of items.</returns>
         Task<IEnumerable<TodoItem>> GetAllAsync();
 
         /// <summary>
         /// Find the target item based on the id.
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns>Item</returns>
+        /// <param name="id">The TodoItem ID.</param>
+        /// <returns>The target TodoItem.</returns>
         Task<TodoItem> FindAsync(long id);
 
         /// <summary>
         /// Add a new item.
         /// </summary>
-        /// <param name="item"></param>
+        /// <param name="item">The target TodoItem.</param>
         /// <returns></returns>
         Task AddAsync(TodoItem item);
 
         /// <summary>
         /// Remove an item.
         /// </summary>
-        /// <param name="item"></param>
+        /// <param name="item">The target TodoItem.</param>
         /// <returns></returns>
         Task RemoveAsync(TodoItem item);
 
@@ -42,8 +42,8 @@ namespace TodoApi.Repositories
         /// <summary>
         /// Check if the target item exists or not.
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns>True if it exists</returns>
+        /// <param name="id">The TodoItem ID.</param>
+        /// <returns>True if it exists.</returns>
         bool DoesItemExist(long id);
     }
 }

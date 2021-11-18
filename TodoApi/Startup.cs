@@ -77,7 +77,7 @@ namespace TodoApi
         /// <summary>
         /// Add authentication.
         /// </summary>
-        /// <param name="services"></param>
+        /// <param name="services">The IServiceCollection.</param>
         private void AddAuthentication(IServiceCollection services)
         {
             services.AddAuthentication()
@@ -97,13 +97,20 @@ namespace TodoApi
                             IssuerSigningKey = new SymmetricSecurityKey(
                                     Encoding.ASCII.GetBytes(Configuration["JWT:Secret"]))
                         };
+                    })
+                .AddFacebook(facebookOptions =>
+                    {
+                        // This is assuming that we use the secrete storage to store the secretes.
+                        facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
+                        facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+                        facebookOptions.SaveTokens = true;
                     });
         }
 
         /// <summary>
         /// Perform dependency injection.
         /// </summary>
-        /// <param name="services"></param>
+        /// <param name="services">The IServiceCollection.</param>
         private void AddDependencyInjection(IServiceCollection services)
         {
             services.AddScoped<IMyClaim, MyClaim>();
@@ -118,7 +125,7 @@ namespace TodoApi
         /// <summary>
         /// Add DB context.
         /// </summary>
-        /// <param name="services"></param>
+        /// <param name="services">The IServiceCollection.</param>
         private void AddDbContext(IServiceCollection services)
         {
             services.AddDbContext<TodoContext>(opt =>
@@ -132,7 +139,7 @@ namespace TodoApi
         /// <summary>
         /// Add and configure Identity.
         /// </summary>
-        /// <param name="services"></param>
+        /// <param name="services">The IServiceCollection.</param>
         private static void AddIdentity(IServiceCollection services)
         {
             services.AddIdentity<AppUser, IdentityRole>()
@@ -168,7 +175,7 @@ namespace TodoApi
         /// <summary>
         /// Set up Swagger.
         /// </summary>
-        /// <param name="services"></param>
+        /// <param name="services">The IServiceCollection.</param>
         private static void AddSwagger(IServiceCollection services)
         {
             _ = services.AddSwaggerGen(swagger =>
@@ -215,7 +222,7 @@ namespace TodoApi
         /// <summary>
         /// Set the auth cookie policy.
         /// </summary>
-        /// <param name="app"></param>
+        /// <param name="app">The IApplicationBuilder.</param>
         private static void SetAuthCookiePolicy(IApplicationBuilder app)
         {
             app.UseCookiePolicy(new CookiePolicyOptions
